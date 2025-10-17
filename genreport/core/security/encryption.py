@@ -42,11 +42,12 @@ class EncryptionService:
         if cache_key in self._cipher_cache:
             return self._cipher_cache[cache_key]
 
-        # Get encryption key
+        # Get encryption key (Fernet expects base64-encoded key, not raw bytes)
         if tenant_id:
             key = self._get_key_from_kms(tenant_id)
         else:
-            key = base64.urlsafe_b64decode(self._default_key.encode())
+            # Key is already base64-encoded in settings
+            key = self._default_key.encode()
 
         # Create and cache cipher
         cipher = Fernet(key)
@@ -74,7 +75,8 @@ class EncryptionService:
         # return response['Plaintext']
 
         # Placeholder: Use default key for all tenants
-        return base64.urlsafe_b64decode(self._default_key.encode())
+        # Key is already base64-encoded in settings
+        return self._default_key.encode()
 
     def encrypt(self, value: str, tenant_id: Optional[str] = None) -> str:
         """Encrypt a string value.

@@ -10,6 +10,7 @@ from typing import Sequence, Union
 from alembic import op
 import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
+from pgvector.sqlalchemy import Vector
 
 # revision identifiers, used by Alembic.
 revision: str = '20251017_0001'
@@ -209,7 +210,7 @@ def upgrade() -> None:
         sa.Column('chunk_text', sa.Text, nullable=False),
         sa.Column('chunk_index', sa.Integer, nullable=False),
         # PGVector column - 1536 dimensions for OpenAI ada-002
-        sa.Column('embedding', postgresql.ARRAY(sa.Float), nullable=True),
+        sa.Column('embedding', Vector(1536), nullable=True),
         sa.Column('metadata', postgresql.JSONB, nullable=True),
         sa.Column('created_at', sa.DateTime(timezone=True), nullable=False, server_default=sa.func.now()),
         sa.ForeignKeyConstraint(['knowledge_base_id'], ['knowledge_bases.id'], ondelete='CASCADE'),

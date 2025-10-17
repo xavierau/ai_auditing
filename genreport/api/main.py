@@ -148,11 +148,29 @@ async def add_security_headers(request: Request, call_next):
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     """Handle validation errors with detailed error messages."""
     logger.warning(f"Validation error: {exc.errors()}")
+
+    # Convert bytes to strings in errors for JSON serialization
+    def convert_bytes(obj):
+        """Recursively convert bytes to strings in nested structures."""
+        if isinstance(obj, bytes):
+            try:
+                return obj.decode('utf-8')
+            except UnicodeDecodeError:
+                return str(obj)
+        elif isinstance(obj, dict):
+            return {k: convert_bytes(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [convert_bytes(item) for item in obj]
+        return obj
+
+    errors = convert_bytes(exc.errors())
+    body = convert_bytes(exc.body)
+
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={
-            "detail": exc.errors(),
-            "body": exc.body,
+            "detail": errors,
+            "body": body,
         },
     )
 
@@ -222,7 +240,7 @@ async def readiness_check():
 
 
 # Include routers
-from genreport.api.routers import auth, projects
+from genreport.api.routers import auth, files, projects, parsing, kb
 
 app.include_router(
     auth.router, prefix=f"/api/{settings.api_version}/auth", tags=["Authentication"]
@@ -230,7 +248,16 @@ app.include_router(
 app.include_router(
     projects.router, prefix=f"/api/{settings.api_version}/projects", tags=["Projects"]
 )
-# TODO: Add reports router in Sprint 4
+app.include_router(
+    files.router, prefix=f"/api/{settings.api_version}/files", tags=["Files"]
+)
+app.include_router(
+    parsing.router, prefix=f"/api/{settings.api_version}/parsing", tags=["Parsing"]
+)
+app.include_router(
+    kb.router, prefix=f"/api/{settings.api_version}/kb", tags=["Knowledge Base"]
+)
+# TODO: Add reports router in Sprint 4/5
 # app.include_router(reports.router, prefix=f"/api/{settings.api_version}/reports", tags=["Reports"])
 
 

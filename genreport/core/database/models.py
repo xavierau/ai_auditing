@@ -59,7 +59,7 @@ class User(Base):
     full_name = Column(String(255), nullable=True)
     role = Column(String(50), default="auditor")  # admin, auditor, viewer
     is_active = Column(Boolean, default=True)
-    last_login = Column(DateTime, nullable=True)
+    last_login_at = Column(DateTime, nullable=True)  # Fixed: was last_login
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -251,8 +251,20 @@ class KnowledgeBase(Base):
     document_type = Column(String(50), nullable=True)  # standard, guidance, case_study
     source_file_path = Column(Text, nullable=True)
     raw_content = Column(Text, nullable=True)
+
+    # Hierarchy support
+    parent_id = Column(Integer, ForeignKey("knowledge_base.id"), nullable=True)
+    section_level = Column(Integer, default=0)  # 0=document, 1=chapter, 2=section
+    section_path = Column(String(255), nullable=True)  # e.g., "15.1.2"
+
+    # Versioning support
     effective_date = Column(Date, nullable=True)
+    supersedes_id = Column(Integer, ForeignKey("knowledge_base.id"), nullable=True)
+
+    # Access control
+    access_level = Column(String(20), default="PUBLIC")  # PUBLIC, TENANT, RESTRICTED
     is_active = Column(Boolean, default=True)
+
     kb_metadata = Column(JSONB, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -265,6 +277,8 @@ class KnowledgeBase(Base):
         Index("idx_kb_jurisdiction", "jurisdiction"),
         Index("idx_kb_standard", "standard"),
         Index("idx_kb_active", "is_active"),
+        Index("idx_kb_parent", "parent_id"),
+        Index("idx_kb_compound_filter", "jurisdiction", "is_active", "tenant_id"),
     )
 
 
@@ -279,10 +293,22 @@ class KBChunk(Base):
     kb_document_id = Column(
         Integer, ForeignKey("knowledge_base.id", ondelete="CASCADE"), nullable=False
     )
-    chunk_index = Column(Integer, nullable=True)
-    chunk_type = Column(String(50), nullable=True)
-    content = Column(Text, nullable=True)
-    embedding = Column(Vector(1536), nullable=True)  # OpenAI ada-002 dimensions
+    chunk_index = Column(Integer, nullable=False)
+    chunk_type = Column(String(50), nullable=True)  # definition, requirement, example, guidance
+    content = Column(Text, nullable=False)
+    embedding = Column(Vector(1536), nullable=True)  # Supports both Gemini and OpenAI embeddings
+    embedding_model = Column(String(100), nullable=True)  # Track which model generated the embedding
+
+    # Quality metrics for semi-automated approval
+    confidence_score = Column(Float, nullable=True)  # LLM confidence 0.0 to 1.0
+    review_status = Column(String(50), default="pending")  # auto_approved, pending_review, reviewed
+    reviewed_by = Column(Integer, ForeignKey("users.id"), nullable=True)
+    reviewed_at = Column(DateTime, nullable=True)
+
+    # Cross-references
+    cross_references = Column(JSONB, nullable=True)  # Links to related sections
+    prerequisites = Column(JSONB, nullable=True)  # Required background knowledge
+
     chunk_metadata = Column(JSONB, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -293,7 +319,106 @@ class KBChunk(Base):
         Index("idx_kb_chunks_tenant", "tenant_id"),
         Index("idx_kb_chunks_jurisdiction", "jurisdiction"),
         Index("idx_kb_chunks_document", "kb_document_id"),
+        Index("idx_kb_chunks_review_status", "review_status"),
+        Index("idx_kb_chunks_compound_filter", "jurisdiction", "tenant_id", "review_status"),
         # Vector similarity index (created after data is loaded)
         # Index("idx_kb_chunks_embedding", "embedding", postgresql_using="ivfflat",
         #       postgresql_ops={"embedding": "vector_cosine_ops"}),
+    )
+
+
+class FileMetadata(Base):
+    """Uploaded file metadata with encryption tracking."""
+
+    __tablename__ = "file_metadata"
+
+    id = Column(PGUUID(as_uuid=True), primary_key=True, default=uuid4)
+    tenant_id = Column(PGUUID(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    project_id = Column(Integer, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
+    uploaded_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+    original_filename = Column(String(255), nullable=False)
+    storage_path = Column(Text, nullable=False)  # Path to encrypted file
+    file_size = Column(Integer, nullable=False)  # Original file size in bytes
+    mime_type = Column(String(100), nullable=True)
+    encrypted = Column(Boolean, default=True)
+    has_macros = Column(Boolean, default=False)  # Detected macros
+    parsing_status = Column(
+        String(50), default="pending"
+    )  # pending, in_progress, completed, failed
+    parsing_error = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    worksheet_analyses = relationship(
+        "WorksheetAnalysis", back_populates="file", lazy="dynamic", cascade="all, delete-orphan"
+    )
+    relationship_maps = relationship(
+        "RelationshipMap", back_populates="file", lazy="dynamic", cascade="all, delete-orphan"
+    )
+
+    __table_args__ = (
+        Index("idx_file_metadata_tenant", "tenant_id"),
+        Index("idx_file_metadata_project", "project_id"),
+        Index("idx_file_metadata_status", "parsing_status"),
+        Index("idx_file_metadata_created", "created_at"),
+    )
+
+
+class WorksheetAnalysis(Base):
+    """Preliminary scanner worksheet analysis results."""
+
+    __tablename__ = "worksheet_analyses"
+
+    id = Column(Integer, primary_key=True)
+    tenant_id = Column(PGUUID(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    project_id = Column(Integer, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
+    file_id = Column(
+        PGUUID(as_uuid=True), ForeignKey("file_metadata.id", ondelete="CASCADE"), nullable=False
+    )
+    worksheet_name = Column(String(255), nullable=False)
+    is_summary = Column(Boolean, default=False)
+    is_supporting = Column(Boolean, default=False)
+    referenced_codes = Column(ARRAY(Text), nullable=True)  # Other worksheet codes referenced
+    importance_score = Column(Float, nullable=True)  # 0.0 to 1.0
+    analysis_metadata = Column(JSONB, nullable=True)  # Additional LLM analysis results
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    file = relationship("FileMetadata", back_populates="worksheet_analyses")
+
+    __table_args__ = (
+        Index("idx_worksheet_analyses_tenant", "tenant_id"),
+        Index("idx_worksheet_analyses_project", "project_id"),
+        Index("idx_worksheet_analyses_file", "file_id"),
+        Index("idx_worksheet_analyses_importance", "importance_score"),
+    )
+
+
+class RelationshipMap(Base):
+    """Worksheet relationship mapping from preliminary scanner."""
+
+    __tablename__ = "relationship_maps"
+
+    id = Column(Integer, primary_key=True)
+    tenant_id = Column(PGUUID(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    project_id = Column(Integer, ForeignKey("projects.id", ondelete="CASCADE"), nullable=False)
+    file_id = Column(
+        PGUUID(as_uuid=True), ForeignKey("file_metadata.id", ondelete="CASCADE"), nullable=False
+    )
+    coding_system = Column(String(255), nullable=True)  # Discovered coding pattern
+    code_families = Column(JSONB, nullable=True)  # Grouped code families from LLM
+    relationships = Column(JSONB, nullable=True)  # Complete relationship graph
+    recommended_sheets = Column(ARRAY(Text), nullable=True)  # Top-priority worksheets
+    confidence_score = Column(Float, nullable=True)  # Overall confidence 0.0 to 1.0
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    file = relationship("FileMetadata", back_populates="relationship_maps")
+
+    __table_args__ = (
+        Index("idx_relationship_maps_tenant", "tenant_id"),
+        Index("idx_relationship_maps_project", "project_id"),
+        Index("idx_relationship_maps_file", "file_id"),
     )

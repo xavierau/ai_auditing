@@ -20,7 +20,7 @@ from genreport.core.utils.config import settings
 config = context.config
 
 # Set the database URL from settings
-config.set_main_option("sqlalchemy.url", settings.database_url)
+config.set_main_option("sqlalchemy.url", str(settings.database_url))
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

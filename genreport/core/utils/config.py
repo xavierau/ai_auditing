@@ -65,6 +65,13 @@ class Settings(BaseSettings):
     openai_max_tokens: int = Field(default=4096)
     openai_temperature: float = Field(default=0.1)
 
+    # Embedding Configuration
+    embedding_provider: str = Field(default="gemini")  # gemini or openai
+    gemini_embedding_model: str = Field(default="models/gemini-embedding-001")  # Supports 128-3072 dimensions
+    gemini_embedding_dimensions: int = Field(default=1536)  # Match OpenAI dimensions for compatibility
+    openai_embedding_model: str = Field(default="text-embedding-ada-002")
+    openai_embedding_dimensions: int = Field(default=1536)
+
     # Langfuse
     langfuse_public_key: str = Field(default="")
     langfuse_secret_key: str = Field(default="")
@@ -189,6 +196,33 @@ class Settings(BaseSettings):
         elif self.default_llm_provider == "openai":
             return self.openai_temperature
         return 0.1
+
+    @property
+    def embedding_model(self) -> str:
+        """Get the embedding model for the configured provider."""
+        if self.embedding_provider == "gemini":
+            return self.gemini_embedding_model
+        elif self.embedding_provider == "openai":
+            return self.openai_embedding_model
+        return self.gemini_embedding_model
+
+    @property
+    def embedding_dimensions(self) -> int:
+        """Get the embedding dimensions for the configured provider."""
+        if self.embedding_provider == "gemini":
+            return self.gemini_embedding_dimensions
+        elif self.embedding_provider == "openai":
+            return self.openai_embedding_dimensions
+        return 768
+
+    @property
+    def embedding_api_key(self) -> str:
+        """Get the API key for the embedding provider."""
+        if self.embedding_provider == "gemini":
+            return self.google_api_key
+        elif self.embedding_provider == "openai":
+            return self.openai_api_key
+        return ""
 
 
 @lru_cache()

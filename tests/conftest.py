@@ -12,6 +12,13 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from uuid import uuid4
 
+# Import settings module and clear cache to force reload with test environment
+from genreport.core.utils.config import get_settings
+
+# Clear the lru_cache to force settings reload with APP_ENV=test
+get_settings.cache_clear()
+
+# Now import the rest - settings will be reloaded with APP_ENV=test
 from genreport.api.main import app
 from genreport.core.database.base import Base, get_db
 from genreport.core.database.models import Tenant, User
@@ -190,3 +197,42 @@ def second_tenant_auth_token(second_tenant_user):
 def second_tenant_auth_headers(second_tenant_auth_token):
     """Generate authentication headers for second tenant."""
     return {"Authorization": f"Bearer {second_tenant_auth_token}"}
+
+
+@pytest.fixture
+def test_client_obj(db, test_tenant):
+    """Create a test client for projects."""
+    from genreport.core.database.models import Client
+
+    client = Client(
+        tenant_id=test_tenant.id,
+        company_name="Test Client Ltd",
+        contact_email="client@example.com",
+        contact_phone="+852 1234 5678",
+        address="123 Test Street, Hong Kong",
+    )
+    db.add(client)
+    db.commit()
+    db.refresh(client)
+    return client
+
+
+@pytest.fixture
+def test_project(db, test_tenant, test_client_obj):
+    """Create a test project."""
+    from genreport.core.database.models import Project
+    from datetime import date
+
+    project = Project(
+        tenant_id=test_tenant.id,
+        client_id=test_client_obj.id,
+        project_name="Test Project 2024",
+        jurisdiction="HK",
+        accounting_standard="HKFRS",
+        financial_year_end=date(2024, 12, 31),
+        status="in_progress",
+    )
+    db.add(project)
+    db.commit()
+    db.refresh(project)
+    return project
