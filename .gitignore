@@ -1,0 +1,254 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.env/
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Environment Variables (SECURITY CRITICAL)
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+*.env
+
+# IMPORTANT: Keep example files
+!.env.example
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+.idea_modules/
+
+# VS Code
+.vscode/
+*.code-workspace
+.history/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# pytest
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.cover
+.hypothesis/
+.tox/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Ruff
+.ruff_cache/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# PostgreSQL
+*.sql
+postgres-data/
+
+# Redis
+dump.rdb
+
+# Alembic
+# Keep migration files, but ignore local database
+*.pyc
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Upload Directories
+uploads/
+encrypted/
+temp/
+tmp/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Backup files
+*.bak
+*.backup
+*.orig
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# Editor backups
+*~
+*.swp
+*.swo
+*.swn
+.*.sw[a-z]
+
+# Documentation builds
+docs/_build/
+docs/.doctrees/
+site/
+
+# Package files
+*.tar.gz
+*.zip
+*.7z
+*.dmg
+*.pkg
+
+# Security & Keys (CRITICAL - NEVER COMMIT)
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.der
+secrets/
+credentials/
+*.credentials
+.aws/
+.gcp/
+
+# Terraform (if used)
+.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+
+# Docker
+.dockerignore
+
+# Local development
+.local/
+local/
+scratch/
+sandbox/
+
+# Node modules (if frontend added)
+node_modules/
+
+# Reports & Generated Files
+reports/*.pdf
+reports/*.docx
+reports/*.xlsx
+# Keep report templates
+!reports/templates/
+
+# Test data
+test_data/
+fixtures/*.xlsx
+fixtures/*.pdf
+# Keep fixture templates
+!fixtures/templates/
+
+# Performance profiling
+*.prof
+*.lprof
+
+# Coverage reports
+.coverage
+coverage/
+
+# Langfuse local cache
+.langfuse/
+
+# UV package manager
+.uv/
+
+# Rye
+.rye/
+
+# PDM
+.pdm.toml
+__pypackages__/
+
+# PEP 582
+__pypackages__/
+
+# Static files (if collected)
+staticfiles/
+static_root/
+
+# Media files
+media/
+
+# Compiled translations
+*.mo
+
+# Sentry
+.sentryclirc
+
+# LLM API keys and configs (redundant but explicit)
+openai.key
+google.key
+anthropic.key
+
+# macOS metadata
+**/.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+
+# Lock files (optional - team decision)
+# Uncomment if you want to ignore lock files
+# poetry.lock
+# Pipfile.lock
+# requirements.lock
