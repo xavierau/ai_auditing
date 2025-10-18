@@ -240,7 +240,7 @@ async def readiness_check():
 
 
 # Include routers
-from genreport.api.routers import auth, files, projects, parsing, kb
+from genreport.api.routers import auth, files, projects, parsing, kb, reports
 
 app.include_router(
     auth.router, prefix=f"/api/{settings.api_version}/auth", tags=["Authentication"]
@@ -257,8 +257,9 @@ app.include_router(
 app.include_router(
     kb.router, prefix=f"/api/{settings.api_version}/kb", tags=["Knowledge Base"]
 )
-# TODO: Add reports router in Sprint 4/5
-# app.include_router(reports.router, prefix=f"/api/{settings.api_version}/reports", tags=["Reports"])
+app.include_router(
+    reports.router, tags=["Reports"]  # reports.router already has prefix
+)
 
 
 if __name__ == "__main__":

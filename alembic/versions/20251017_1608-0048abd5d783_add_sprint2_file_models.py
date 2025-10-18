@@ -128,10 +128,7 @@ def upgrade() -> None:
                existing_type=sa.VARCHAR(length=50),
                type_=sa.String(length=100),
                existing_nullable=False)
-    op.alter_column('audit_logs', 'ip_address',
-               existing_type=sa.VARCHAR(length=45),
-               type_=postgresql.INET(),
-               existing_nullable=True)
+    op.execute("ALTER TABLE audit_logs ALTER COLUMN ip_address TYPE INET USING ip_address::inet")
     op.alter_column('audit_logs', 'user_agent',
                existing_type=sa.VARCHAR(length=500),
                type_=sa.Text(),
@@ -609,10 +606,7 @@ def downgrade() -> None:
                existing_type=sa.Text(),
                type_=sa.VARCHAR(length=500),
                existing_nullable=True)
-    op.alter_column('audit_logs', 'ip_address',
-               existing_type=postgresql.INET(),
-               type_=sa.VARCHAR(length=45),
-               existing_nullable=True)
+    op.execute("ALTER TABLE audit_logs ALTER COLUMN ip_address TYPE VARCHAR(45) USING host(ip_address)")
     op.alter_column('audit_logs', 'action',
                existing_type=sa.String(length=100),
                type_=sa.VARCHAR(length=50),

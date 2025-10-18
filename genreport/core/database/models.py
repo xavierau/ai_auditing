@@ -422,3 +422,136 @@ class RelationshipMap(Base):
         Index("idx_relationship_maps_project", "project_id"),
         Index("idx_relationship_maps_file", "file_id"),
     )
+
+
+class GeneratedReport(Base):
+    """Store complete generated reports from AI agents (Sprint 4)."""
+
+    __tablename__ = "generated_reports"
+
+    id = Column(Integer, primary_key=True)
+    tenant_id = Column(PGUUID(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
+    generated_by = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    jurisdiction = Column(String(10), nullable=False)  # HK, SG, AU
+    accounting_standard = Column(String(50), nullable=False)  # HKFRS, SME-FRS
+
+    overall_completeness = Column(Float, nullable=True)  # Average across sections
+    generation_time_seconds = Column(Float, nullable=True)
+    cost_usd = Column(Float, nullable=True)
+
+    status = Column(String(20), default="generating")  # generating, completed, failed
+    error_message = Column(Text, nullable=True)
+
+    is_deleted = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    completed_at = Column(DateTime, nullable=True)
+
+    # Relationships
+    sections = relationship(
+        "ReportSection", back_populates="report", cascade="all, delete-orphan"
+    )
+
+    __table_args__ = (
+        Index("idx_generated_reports_tenant", "tenant_id"),
+        Index("idx_generated_reports_project", "project_id"),
+        Index("idx_generated_reports_status", "status"),
+    )
+
+
+class ReportSection(Base):
+    """Individual report sections (one per agent) (Sprint 4)."""
+
+    __tablename__ = "report_sections"
+
+    id = Column(Integer, primary_key=True)
+    tenant_id = Column(PGUUID(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    report_id = Column(
+        Integer, ForeignKey("generated_reports.id", ondelete="CASCADE"), nullable=False
+    )
+
+    section_name = Column(String(100), nullable=False)  # revenue_recognition, ppe, etc.
+    agent_name = Column(String(100), nullable=False)  # HKRevenueAgent, etc.
+
+    content = Column(Text, nullable=False)  # Generated disclosure
+    standard_used = Column(String(100), nullable=False)  # HKFRS 15, IAS 16, etc.
+
+    completeness_score = Column(Float, nullable=True)  # 0.0 to 1.0
+    required_disclosures_met = Column(JSONB, nullable=True)  # List of checklist items
+
+    pii_detected = Column(Boolean, default=False)
+    pii_types = Column(JSONB, nullable=True)  # List of PII types found
+
+    execution_time_seconds = Column(Float, nullable=True)
+    cost_usd = Column(Float, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    report = relationship("GeneratedReport", back_populates="sections")
+    source_references = relationship(
+        "SourceReference", back_populates="section", cascade="all, delete-orphan"
+    )
+
+    __table_args__ = (
+        Index("idx_report_sections_tenant", "tenant_id"),
+        Index("idx_report_sections_report", "report_id"),
+    )
+
+
+class SourceReference(Base):
+    """KB chunks used for each section (Sprint 4)."""
+
+    __tablename__ = "source_references"
+
+    id = Column(Integer, primary_key=True)
+    tenant_id = Column(PGUUID(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    section_id = Column(
+        Integer, ForeignKey("report_sections.id", ondelete="CASCADE"), nullable=False
+    )
+
+    kb_chunk_id = Column(Integer, ForeignKey("kb_chunks.id"), nullable=False)
+    similarity_score = Column(Float, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    # Relationships
+    section = relationship("ReportSection", back_populates="source_references")
+    kb_chunk = relationship("KBChunk")
+
+    __table_args__ = (
+        Index("idx_source_references_tenant", "tenant_id"),
+        Index("idx_source_references_section", "section_id"),
+    )
+
+
+class AgentExecution(Base):
+    """Audit trail for agent executions (Sprint 4)."""
+
+    __tablename__ = "agent_executions"
+
+    id = Column(Integer, primary_key=True)
+    tenant_id = Column(PGUUID(as_uuid=True), ForeignKey("tenants.id"), nullable=False)
+    report_id = Column(Integer, ForeignKey("generated_reports.id"), nullable=False)
+
+    agent_name = Column(String(100), nullable=False)
+    section_name = Column(String(100), nullable=False)
+
+    started_at = Column(DateTime, nullable=False)
+    completed_at = Column(DateTime, nullable=True)
+
+    status = Column(String(20), nullable=False)  # running, completed, failed
+    error_message = Column(Text, nullable=True)
+
+    context_size_bytes = Column(Integer, nullable=True)
+    prompt_tokens = Column(Integer, nullable=True)
+    completion_tokens = Column(Integer, nullable=True)
+    cost_usd = Column(Float, nullable=True)
+
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    __table_args__ = (
+        Index("idx_agent_executions_tenant", "tenant_id"),
+        Index("idx_agent_executions_report", "report_id"),
+    )
