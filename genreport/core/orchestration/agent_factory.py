@@ -121,21 +121,9 @@ class AgentFactory:
             Dict of agent_type -> agent instance
         """
         # Lazy import to avoid loading all markets
-        try:
-            from markets.hk.agents.revenue_agent import HKRevenueAgent
-            from markets.hk.agents.inventory_agent import HKInventoryAgent
-            from markets.hk.agents.provisions_agent import HKProvisionsAgent
-        except ImportError:
-            # Phase 3 will implement these
-            # For now, return mock agents for testing
-            logger.warning("HK agents not yet implemented, using mock agents for testing")
-            from tests.core.orchestration.test_base_agent import TestAgent
-
-            return {
-                "revenue": TestAgent(market_config, retriever, tenant_id, user_id),
-                "inventory": TestAgent(market_config, retriever, tenant_id, user_id),
-                "provisions": TestAgent(market_config, retriever, tenant_id, user_id),
-            }
+        from markets.hk.agents.revenue_agent import HKRevenueAgent
+        from markets.hk.agents.inventory_agent import HKInventoryAgent
+        from markets.hk.agents.provisions_agent import HKProvisionsAgent
 
         # Create agent instances
         agents = {
