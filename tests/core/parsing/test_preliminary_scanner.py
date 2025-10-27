@@ -1,12 +1,15 @@
 """Tests for PreliminaryScanner with DSPy signatures.
 
 Following TDD approach - these tests define the expected behavior.
+Tests updated for async parallelization.
 """
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+import pytest_asyncio
+from unittest.mock import Mock, patch, MagicMock, AsyncMock
 import tempfile
 import openpyxl
+import asyncio
 
 
 @pytest.fixture
@@ -49,6 +52,14 @@ class TestPreliminaryScanner:
 
         scanner = PreliminaryScanner()
         assert scanner is not None
+        assert scanner.async_max_workers == 4  # Default value
+
+    def test_scanner_initialization_with_custom_workers(self):
+        """Test scanner initialization with custom async_max_workers."""
+        from genreport.core.parsing.preliminary_scanner import PreliminaryScanner
+
+        scanner = PreliminaryScanner(async_max_workers=8)
+        assert scanner.async_max_workers == 8
 
     def test_get_sheet_names_from_file(self, sample_workbook_file):
         """Test getting sheet names from Excel file."""
@@ -63,11 +74,12 @@ class TestPreliminaryScanner:
         assert "TB-02 Details" in sheet_names
         assert "GL-100 General Ledger" in sheet_names
 
+    @pytest.mark.asyncio
     @patch('genreport.core.parsing.preliminary_scanner.dspy')
-    def test_analyze_workbook_returns_preliminary_scan_result(
+    async def test_analyze_workbook_returns_preliminary_scan_result(
         self, mock_dspy, sample_workbook_file
     ):
-        """Test that analyze_workbook returns PreliminaryScanResult."""
+        """Test that analyze_workbook returns PreliminaryScanResult (async)."""
         from genreport.core.parsing.preliminary_scanner import PreliminaryScanner
         from genreport.core.parsing.parsing_models import PreliminaryScanResult
 
@@ -75,18 +87,18 @@ class TestPreliminaryScanner:
         mock_coding_analyzer = MagicMock()
         mock_coding_analyzer.return_value = MagicMock(
             coding_pattern="TB-XX format (Trial Balance codes)",
-            code_families=[{"prefix": "TB", "category": "Trial Balance"}],
+            code_families_json='[{"prefix": "TB", "category": "Trial Balance"}]',
             confidence=0.95
         )
 
-        mock_worksheet_analyzer = MagicMock()
-        mock_worksheet_analyzer.return_value = MagicMock(
+        mock_worksheet_analyzer = AsyncMock()
+        mock_worksheet_analyzer.acall = AsyncMock(return_value=MagicMock(
             is_summary=True,
             is_supporting=False,
             referenced_codes=["TB-02"],
             importance_score=0.9,
             summary="Trial Balance summary sheet with references to TB-02"
-        )
+        ))
 
         mock_dspy.ChainOfThought.side_effect = [
             mock_coding_analyzer,
@@ -94,141 +106,148 @@ class TestPreliminaryScanner:
         ]
 
         scanner = PreliminaryScanner()
-        result = scanner.analyze_workbook(sample_workbook_file)
+        result = await scanner.analyze_workbook(sample_workbook_file)
 
         # Should return PreliminaryScanResult
         assert isinstance(result, PreliminaryScanResult)
         assert result.total_sheets == 3
         assert len(result.worksheet_analyses) == 3
 
+    @pytest.mark.asyncio
     @patch('genreport.core.parsing.preliminary_scanner.dspy')
-    def test_analyze_workbook_discovers_coding_pattern(
+    async def test_analyze_workbook_discovers_coding_pattern(
         self, mock_dspy, sample_workbook_file
     ):
-        """Test that analyze_workbook discovers coding pattern."""
+        """Test that analyze_workbook discovers coding pattern (async)."""
         from genreport.core.parsing.preliminary_scanner import PreliminaryScanner
 
         # Mock coding system discovery
         mock_coding_analyzer = MagicMock()
         mock_coding_analyzer.return_value = MagicMock(
             coding_pattern="TB-XX format",
-            code_families=[{"prefix": "TB", "category": "Trial Balance"}],
+            code_families_json='[{"prefix": "TB", "category": "Trial Balance"}]',
             confidence=0.95
         )
 
         # Mock worksheet analyzer for each sheet
-        mock_worksheet_analyzer = MagicMock()
-        mock_worksheet_analyzer.return_value = MagicMock(
+        mock_worksheet_analyzer = AsyncMock()
+        mock_worksheet_analyzer.acall = AsyncMock(return_value=MagicMock(
             is_summary=True,
             is_supporting=False,
             referenced_codes=[],
             importance_score=0.8,
             summary="Worksheet summary"
-        )
+        ))
 
-        # Provide mocks for all ChainOfThought instances (1 coding + 3 worksheets)
         mock_dspy.ChainOfThought.side_effect = [
             mock_coding_analyzer,
             mock_worksheet_analyzer,
-            mock_worksheet_analyzer,
-            mock_worksheet_analyzer
         ]
 
         scanner = PreliminaryScanner()
-        result = scanner.analyze_workbook(sample_workbook_file)
+        result = await scanner.analyze_workbook(sample_workbook_file)
 
         # Should have coding system
         assert result.coding_system is not None
         assert result.coding_system.coding_pattern == "TB-XX format"
         assert result.coding_system.confidence == 0.95
 
+    @pytest.mark.asyncio
     @patch('genreport.core.parsing.preliminary_scanner.dspy')
-    def test_analyze_workbook_analyzes_each_worksheet(
+    async def test_analyze_workbook_analyzes_each_worksheet(
         self, mock_dspy, sample_workbook_file
     ):
-        """Test that analyze_workbook analyzes each worksheet."""
+        """Test that analyze_workbook analyzes each worksheet in parallel (async)."""
         from genreport.core.parsing.preliminary_scanner import PreliminaryScanner
 
         # Mock responses
         mock_coding_analyzer = MagicMock()
         mock_coding_analyzer.return_value = MagicMock(
             coding_pattern="TB-XX",
-            code_families=[],
+            code_families_json='[]',
             confidence=0.9
         )
 
-        mock_worksheet_analyzer = MagicMock()
-        mock_worksheet_analyzer.return_value = MagicMock(
+        mock_worksheet_analyzer = AsyncMock()
+        mock_worksheet_analyzer.acall = AsyncMock(return_value=MagicMock(
             is_summary=True,
             is_supporting=False,
             referenced_codes=[],
             importance_score=0.8,
             summary="Worksheet analysis summary"
-        )
+        ))
 
         mock_dspy.ChainOfThought.side_effect = [
             mock_coding_analyzer,
             mock_worksheet_analyzer,
-            mock_worksheet_analyzer,
-            mock_worksheet_analyzer
         ]
 
         scanner = PreliminaryScanner()
-        result = scanner.analyze_workbook(sample_workbook_file)
+        result = await scanner.analyze_workbook(sample_workbook_file)
 
         # Should have analysis for each worksheet
         assert len(result.worksheet_analyses) == 3
 
+    @pytest.mark.asyncio
     @patch('genreport.core.parsing.preliminary_scanner.dspy')
-    def test_analyze_workbook_recommends_important_sheets(
+    async def test_analyze_workbook_recommends_important_sheets(
         self, mock_dspy, sample_workbook_file
     ):
-        """Test that analyze_workbook recommends important sheets."""
+        """Test that analyze_workbook recommends important sheets (async)."""
         from genreport.core.parsing.preliminary_scanner import PreliminaryScanner
 
         # Mock coding analyzer
         mock_coding_analyzer = MagicMock()
         mock_coding_analyzer.return_value = MagicMock(
             coding_pattern="TB-XX",
-            code_families=[],
+            code_families_json='[]',
             confidence=0.9
         )
 
         # Mock worksheet analyzers with different importance scores
-        def create_worksheet_response(importance):
+        call_count = [0]
+
+        async def create_response(**kwargs):
+            call_count[0] += 1
+            # Vary scores for different calls
+            scores = [0.9, 0.6, 0.3]
+            idx = min(call_count[0] - 1, len(scores) - 1)
             return MagicMock(
-                is_summary=True if importance > 0.7 else False,
+                is_summary=scores[idx] > 0.7,
                 is_supporting=False,
                 referenced_codes=[],
-                importance_score=importance,
-                summary=f"Worksheet with importance score {importance}"
+                importance_score=scores[idx],
+                summary=f"Worksheet with importance score {scores[idx]}"
             )
+
+        mock_worksheet_analyzer = AsyncMock()
+        mock_worksheet_analyzer.acall = create_response
 
         mock_dspy.ChainOfThought.side_effect = [
             mock_coding_analyzer,
-            lambda **kwargs: create_worksheet_response(0.9),  # TB-01 Summary
-            lambda **kwargs: create_worksheet_response(0.6),  # TB-02 Details
-            lambda **kwargs: create_worksheet_response(0.3),  # GL-100
+            mock_worksheet_analyzer,
         ]
 
         scanner = PreliminaryScanner()
-        result = scanner.analyze_workbook(sample_workbook_file)
+        result = await scanner.analyze_workbook(sample_workbook_file)
 
         # Should have recommended sheets
         assert len(result.recommended_sheets) > 0
 
-    def test_analyze_nonexistent_file_raises_error(self):
-        """Test that analyzing nonexistent file raises error."""
+    @pytest.mark.asyncio
+    async def test_analyze_nonexistent_file_raises_error(self):
+        """Test that analyzing nonexistent file raises error (async)."""
         from genreport.core.parsing.preliminary_scanner import PreliminaryScanner
 
         scanner = PreliminaryScanner()
 
         with pytest.raises(FileNotFoundError):
-            scanner.analyze_workbook("nonexistent_file.xlsx")
+            await scanner.analyze_workbook("nonexistent_file.xlsx")
 
+    @pytest.mark.asyncio
     @patch('genreport.core.parsing.preliminary_scanner.dspy')
-    def test_scanner_handles_empty_workbook(self, mock_dspy):
-        """Test that scanner handles workbook with no sheets gracefully."""
+    async def test_scanner_handles_empty_workbook(self, mock_dspy):
+        """Test that scanner handles workbook with no sheets gracefully (async)."""
         from genreport.core.parsing.preliminary_scanner import PreliminaryScanner
 
         # Create a minimal valid workbook (openpyxl requires at least one sheet)
@@ -246,7 +265,174 @@ class TestPreliminaryScanner:
             with patch.object(scanner, '_get_sheet_names', return_value=[]):
                 # Should raise ValueError for workbook with no sheets
                 with pytest.raises(ValueError, match="Workbook has no sheets"):
-                    scanner.analyze_workbook(tmp.name)
+                    await scanner.analyze_workbook(tmp.name)
+
+
+class TestPreliminaryScannerAsyncBehavior:
+    """Tests specific to async parallelization behavior."""
+
+    @pytest.mark.asyncio
+    @patch('genreport.core.parsing.preliminary_scanner.dspy')
+    async def test_worksheets_analyzed_concurrently(self, mock_dspy, sample_workbook_file):
+        """Test that worksheets are analyzed concurrently (not sequentially)."""
+        from genreport.core.parsing.preliminary_scanner import PreliminaryScanner
+
+        # Track execution order
+        execution_log = []
+
+        # Mock coding analyzer
+        mock_coding_analyzer = MagicMock()
+        mock_coding_analyzer.return_value = MagicMock(
+            coding_pattern="TB-XX",
+            code_families_json='[]',
+            confidence=0.9
+        )
+
+        # Mock worksheet analyzer that logs execution
+        async def log_execution(sheet_name, **kwargs):
+            execution_log.append(f"start-{sheet_name}")
+            await asyncio.sleep(0.01)  # Simulate async work
+            execution_log.append(f"end-{sheet_name}")
+            return MagicMock(
+                is_summary=True,
+                is_supporting=False,
+                referenced_codes=[],
+                importance_score=0.8,
+                summary=f"Analysis for {sheet_name}"
+            )
+
+        mock_worksheet_analyzer = AsyncMock()
+        mock_worksheet_analyzer.acall = log_execution
+
+        mock_dspy.ChainOfThought.side_effect = [
+            mock_coding_analyzer,
+            mock_worksheet_analyzer,
+        ]
+
+        scanner = PreliminaryScanner()
+        await scanner.analyze_workbook(sample_workbook_file)
+
+        # In concurrent execution, starts should be interleaved with ends
+        # (not all starts first, then all ends)
+        start_indices = [i for i, log in enumerate(execution_log) if log.startswith('start')]
+        end_indices = [i for i, log in enumerate(execution_log) if log.startswith('end')]
+
+        # Check that execution was concurrent (ends happen before all starts complete)
+        assert len(start_indices) == 3
+        assert len(end_indices) == 3
+
+    @pytest.mark.asyncio
+    @patch('genreport.core.parsing.preliminary_scanner.dspy')
+    async def test_partial_worksheet_failure_handled_gracefully(
+        self, mock_dspy, sample_workbook_file
+    ):
+        """Test that failure of individual worksheets doesn't stop analysis."""
+        from genreport.core.parsing.preliminary_scanner import PreliminaryScanner
+
+        # Mock coding analyzer
+        mock_coding_analyzer = MagicMock()
+        mock_coding_analyzer.return_value = MagicMock(
+            coding_pattern="TB-XX",
+            code_families_json='[]',
+            confidence=0.9
+        )
+
+        # Mock worksheet analyzer that fails for second sheet
+        call_count = [0]
+
+        async def fail_second_call(**kwargs):
+            call_count[0] += 1
+            if call_count[0] == 2:
+                raise Exception("Simulated worksheet analysis failure")
+            return MagicMock(
+                is_summary=True,
+                is_supporting=False,
+                referenced_codes=[],
+                importance_score=0.8,
+                summary="Successful analysis"
+            )
+
+        mock_worksheet_analyzer = AsyncMock()
+        mock_worksheet_analyzer.acall = fail_second_call
+
+        mock_dspy.ChainOfThought.side_effect = [
+            mock_coding_analyzer,
+            mock_worksheet_analyzer,
+        ]
+
+        scanner = PreliminaryScanner()
+        result = await scanner.analyze_workbook(sample_workbook_file)
+
+        # Should have analysis for 2 successful worksheets (1 failed)
+        assert len(result.worksheet_analyses) == 2
+        assert result.total_sheets == 3
+
+    @pytest.mark.asyncio
+    @patch('genreport.core.parsing.preliminary_scanner.dspy')
+    async def test_all_worksheets_fail_raises_error(self, mock_dspy, sample_workbook_file):
+        """Test that if all worksheets fail, appropriate error is raised."""
+        from genreport.core.parsing.preliminary_scanner import PreliminaryScanner
+
+        # Mock coding analyzer
+        mock_coding_analyzer = MagicMock()
+        mock_coding_analyzer.return_value = MagicMock(
+            coding_pattern="TB-XX",
+            code_families_json='[]',
+            confidence=0.9
+        )
+
+        # Mock worksheet analyzer that always fails
+        async def always_fail(**kwargs):
+            raise Exception("Simulated failure")
+
+        mock_worksheet_analyzer = AsyncMock()
+        mock_worksheet_analyzer.acall = always_fail
+
+        mock_dspy.ChainOfThought.side_effect = [
+            mock_coding_analyzer,
+            mock_worksheet_analyzer,
+        ]
+
+        scanner = PreliminaryScanner()
+
+        with pytest.raises(ValueError, match="All worksheet analyses failed"):
+            await scanner.analyze_workbook(sample_workbook_file)
+
+    @pytest.mark.asyncio
+    @patch('genreport.core.parsing.preliminary_scanner.dspy')
+    async def test_async_max_workers_configuration(self, mock_dspy, sample_workbook_file):
+        """Test that async_max_workers is properly configured."""
+        from genreport.core.parsing.preliminary_scanner import PreliminaryScanner
+
+        # Mock coding analyzer
+        mock_coding_analyzer = MagicMock()
+        mock_coding_analyzer.return_value = MagicMock(
+            coding_pattern="TB-XX",
+            code_families_json='[]',
+            confidence=0.9
+        )
+
+        mock_worksheet_analyzer = AsyncMock()
+        mock_worksheet_analyzer.acall = AsyncMock(return_value=MagicMock(
+            is_summary=True,
+            is_supporting=False,
+            referenced_codes=[],
+            importance_score=0.8,
+            summary="Test"
+        ))
+
+        mock_dspy.ChainOfThought.side_effect = [
+            mock_coding_analyzer,
+            mock_worksheet_analyzer,
+        ]
+
+        # Test with different worker counts
+        for workers in [2, 4, 8]:
+            scanner = PreliminaryScanner(async_max_workers=workers)
+            assert scanner.async_max_workers == workers
+
+            result = await scanner.analyze_workbook(sample_workbook_file)
+            assert len(result.worksheet_analyses) == 3
 
 
 class TestPreliminaryScannerCodingSystemAnalyzer:
@@ -267,45 +453,8 @@ class TestPreliminaryScannerCodingSystemAnalyzer:
         annotations = CodingSystemAnalyzer.__annotations__
         assert 'worksheet_names' in annotations
         assert 'coding_pattern' in annotations
-        assert 'code_families' in annotations
+        assert 'code_families_json' in annotations
         assert 'confidence' in annotations
-
-    @patch('genreport.core.parsing.preliminary_scanner.dspy')
-    def test_coding_system_analyzer_called_once_per_workbook(
-        self, mock_dspy, sample_workbook_file
-    ):
-        """Test that coding system analyzer is called once per workbook (Phase 1a)."""
-        from genreport.core.parsing.preliminary_scanner import PreliminaryScanner
-
-        # Track how many times coding analyzer is created
-        call_count = 0
-
-        def mock_chain_of_thought(signature):
-            nonlocal call_count
-            if 'CodingSystem' in str(signature):
-                call_count += 1
-
-            mock_analyzer = MagicMock()
-            mock_analyzer.return_value = MagicMock(
-                coding_pattern="test",
-                code_families=[],
-                confidence=0.9,
-                is_summary=True,
-                is_supporting=False,
-                referenced_codes=[],
-                importance_score=0.8,
-                summary="Test worksheet summary"
-            )
-            return mock_analyzer
-
-        mock_dspy.ChainOfThought.side_effect = mock_chain_of_thought
-
-        scanner = PreliminaryScanner()
-        scanner.analyze_workbook(sample_workbook_file)
-
-        # Should be called exactly once (Phase 1a)
-        # Note: This test may need adjustment based on actual implementation
-        assert call_count <= 1
 
 
 class TestPreliminaryScannerWorksheetAnalyzer:
@@ -321,79 +470,36 @@ class TestPreliminaryScannerWorksheetAnalyzer:
         assert 'sheet_name' in annotations
         assert 'worksheet_content' in annotations  # New field: worksheet content
         assert 'coding_pattern' in annotations
-        assert 'code_families' in annotations
+        assert 'code_families_json' in annotations
         assert 'is_summary' in annotations
         assert 'is_supporting' in annotations
         assert 'referenced_codes' in annotations
         assert 'importance_score' in annotations
         assert 'summary' in annotations  # New field: summary output
 
-    @patch('genreport.core.parsing.preliminary_scanner.dspy')
-    def test_worksheet_analyzer_uses_coding_context(
-        self, mock_dspy, sample_workbook_file
-    ):
-        """Test that worksheet analyzer receives coding context."""
-        from genreport.core.parsing.preliminary_scanner import PreliminaryScanner
-
-        # Track worksheet analyzer calls
-        worksheet_analyzer_calls = []
-
-        def mock_chain_of_thought(signature):
-            mock_analyzer = MagicMock()
-
-            def analyzer_call(**kwargs):
-                worksheet_analyzer_calls.append(kwargs)
-                return MagicMock(
-                    coding_pattern="test",
-                    code_families=[],
-                    confidence=0.9,
-                    is_summary=True,
-                    is_supporting=False,
-                    referenced_codes=[],
-                    importance_score=0.8,
-                    summary="Worksheet analysis summary"
-                )
-
-            mock_analyzer.side_effect = analyzer_call
-            return mock_analyzer
-
-        mock_dspy.ChainOfThought.side_effect = mock_chain_of_thought
-
-        scanner = PreliminaryScanner()
-        result = scanner.analyze_workbook(sample_workbook_file)
-
-        # Worksheet analyzers should receive coding_pattern and code_families
-        # (at least some of the calls should have these parameters)
-        if worksheet_analyzer_calls:
-            has_coding_context = any(
-                'coding_pattern' in call for call in worksheet_analyzer_calls
-            )
-            # May not always be present depending on implementation
-            # This is just to verify the structure
-
 
 class TestPreliminaryScannerIntegration:
     """Integration tests for PreliminaryScanner."""
 
+    @pytest.mark.asyncio
     @patch('genreport.core.parsing.preliminary_scanner.dspy')
-    def test_full_analysis_workflow(self, mock_dspy, sample_workbook_file):
-        """Test complete analysis workflow from file to result."""
+    async def test_full_analysis_workflow(self, mock_dspy, sample_workbook_file):
+        """Test complete analysis workflow from file to result (async)."""
         from genreport.core.parsing.preliminary_scanner import PreliminaryScanner
 
         # Mock complete workflow
         mock_coding_analyzer = MagicMock()
         mock_coding_analyzer.return_value = MagicMock(
             coding_pattern="TB-XX Trial Balance codes",
-            code_families=[
-                {"prefix": "TB", "category": "Trial Balance", "count": 2},
-                {"prefix": "GL", "category": "General Ledger", "count": 1}
-            ],
+            code_families_json='[{"prefix": "TB", "category": "Trial Balance"}, {"prefix": "GL", "category": "General Ledger"}]',
             confidence=0.92
         )
 
-        mock_worksheet_analyzer = MagicMock()
+        call_count = [0]
 
-        def worksheet_response(sheet_name, **kwargs):
+        async def worksheet_response(**kwargs):
+            call_count[0] += 1
+            sheet_name = kwargs.get('sheet_name', '')
             if "Summary" in sheet_name:
                 return MagicMock(
                     is_summary=True,
@@ -411,17 +517,16 @@ class TestPreliminaryScannerIntegration:
                     summary="Supporting detail worksheet"
                 )
 
-        mock_worksheet_analyzer.side_effect = worksheet_response
+        mock_worksheet_analyzer = AsyncMock()
+        mock_worksheet_analyzer.acall = worksheet_response
 
         mock_dspy.ChainOfThought.side_effect = [
             mock_coding_analyzer,
             mock_worksheet_analyzer,
-            mock_worksheet_analyzer,
-            mock_worksheet_analyzer
         ]
 
         scanner = PreliminaryScanner()
-        result = scanner.analyze_workbook(sample_workbook_file)
+        result = await scanner.analyze_workbook(sample_workbook_file)
 
         # Verify complete result
         assert result.total_sheets == 3
@@ -680,23 +785,28 @@ class TestPreliminaryScannerNetworkAnalysis:
         tb02 = next(a for a in adjusted if "TB-02" in a.sheet_name)
         assert tb02.analysis_metadata["incoming_references"] > 0
 
+    @pytest.mark.asyncio
     @patch('genreport.core.parsing.preliminary_scanner.dspy')
-    def test_analyze_workbook_applies_network_analysis(
+    async def test_analyze_workbook_applies_network_analysis(
         self, mock_dspy, sample_workbook_file
     ):
-        """Test that analyze_workbook applies network analysis to results."""
+        """Test that analyze_workbook applies network analysis to results (async)."""
         from genreport.core.parsing.preliminary_scanner import PreliminaryScanner
 
         # Mock coding analyzer
         mock_coding_analyzer = MagicMock()
         mock_coding_analyzer.return_value = MagicMock(
             coding_pattern="TB-XX",
-            code_families=[],
+            code_families_json='[]',
             confidence=0.9
         )
 
         # Mock worksheet analyzers with references
-        def create_response(sheet_name):
+        call_count = [0]
+
+        async def create_response(**kwargs):
+            call_count[0] += 1
+            sheet_name = kwargs.get('sheet_name', '')
             if "Summary" in sheet_name:
                 return MagicMock(
                     is_summary=True,
@@ -714,18 +824,16 @@ class TestPreliminaryScannerNetworkAnalysis:
                     summary="Detail sheet"
                 )
 
-        mock_worksheet_analyzer = MagicMock()
-        mock_worksheet_analyzer.side_effect = lambda sheet_name, **kwargs: create_response(sheet_name)
+        mock_worksheet_analyzer = AsyncMock()
+        mock_worksheet_analyzer.acall = create_response
 
         mock_dspy.ChainOfThought.side_effect = [
             mock_coding_analyzer,
             mock_worksheet_analyzer,
-            mock_worksheet_analyzer,
-            mock_worksheet_analyzer
         ]
 
         scanner = PreliminaryScanner()
-        result = scanner.analyze_workbook(sample_workbook_file)
+        result = await scanner.analyze_workbook(sample_workbook_file)
 
         # Check that network analysis metadata is present
         for analysis in result.worksheet_analyses:

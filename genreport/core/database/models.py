@@ -1,6 +1,7 @@
 """Database models with multi-tenant support."""
 
 from datetime import datetime
+from enum import Enum
 from typing import Optional
 from uuid import UUID, uuid4
 
@@ -22,6 +23,13 @@ from sqlalchemy.dialects.postgresql import INET, JSONB, UUID as PGUUID
 from sqlalchemy.orm import relationship
 
 from genreport.core.database.base import Base
+
+
+class Jurisdiction(str, Enum):
+    """Supported jurisdictions for market-aware processing."""
+    HK = "HK"  # Hong Kong
+    SG = "SG"  # Singapore
+    AU = "AU"  # Australia
 
 
 class Tenant(Base):
@@ -381,6 +389,7 @@ class WorksheetAnalysis(Base):
     is_supporting = Column(Boolean, default=False)
     referenced_codes = Column(ARRAY(Text), nullable=True)  # Other worksheet codes referenced
     importance_score = Column(Float, nullable=True)  # 0.0 to 1.0
+    summary = Column(Text, nullable=True)  # LLM-generated worksheet summary
     analysis_metadata = Column(JSONB, nullable=True)  # Additional LLM analysis results
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -406,7 +415,7 @@ class RelationshipMap(Base):
     file_id = Column(
         PGUUID(as_uuid=True), ForeignKey("file_metadata.id", ondelete="CASCADE"), nullable=False
     )
-    coding_system = Column(String(255), nullable=True)  # Discovered coding pattern
+    coding_system = Column(Text, nullable=True)  # Discovered coding pattern (LLM-generated, can be long)
     code_families = Column(JSONB, nullable=True)  # Grouped code families from LLM
     relationships = Column(JSONB, nullable=True)  # Complete relationship graph
     recommended_sheets = Column(ARRAY(Text), nullable=True)  # Top-priority worksheets

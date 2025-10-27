@@ -7,6 +7,7 @@ import os
 os.environ["APP_ENV"] = "test"
 
 import pytest
+import bcrypt
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
@@ -22,8 +23,38 @@ get_settings.cache_clear()
 from genreport.api.main import app
 from genreport.core.database.base import Base, get_db
 from genreport.core.database.models import Tenant, User
-from genreport.core.security.jwt_service import create_access_token, hash_password
+from genreport.core.security.jwt_service import create_access_token
 from genreport.core.utils.config import settings
+
+
+# Pre-hash test passwords at module level using bcrypt directly
+# This avoids passlib/bcrypt compatibility issues in test fixtures
+# passlib 1.7.4 is incompatible with bcrypt 4.x due to __about__ module removal
+_TEST_PASSWORDS = {
+    "testpassword123": bcrypt.hashpw(b"testpassword123", bcrypt.gensalt()).decode('utf-8'),
+    "adminpassword123": bcrypt.hashpw(b"adminpassword123", bcrypt.gensalt()).decode('utf-8'),
+    "secondpassword123": bcrypt.hashpw(b"secondpassword123", bcrypt.gensalt()).decode('utf-8'),
+}
+
+# Monkey-patch jwt_service functions to use bcrypt directly in tests
+# This avoids passlib/bcrypt incompatibility
+def _test_verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Test-specific password verification using bcrypt directly."""
+    return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+
+def _test_hash_password(password: str) -> str:
+    """Test-specific password hashing using bcrypt directly."""
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+# Apply monkey-patches to jwt_service module
+import genreport.core.security.jwt_service
+genreport.core.security.jwt_service.verify_password = _test_verify_password
+genreport.core.security.jwt_service.hash_password = _test_hash_password
+
+# Also patch the auth router which imports these functions
+# This must happen AFTER importing the main app (which imports the routers)
+import genreport.api.routers.auth
+genreport.api.routers.auth.hash_password = _test_hash_password
 
 
 # Use PostgreSQL for testing (same as development/production)
@@ -98,7 +129,7 @@ def test_user(db, test_tenant):
     user = User(
         tenant_id=test_tenant.id,
         email="test@example.com",
-        password_hash=hash_password("testpassword123"),
+        password_hash=_TEST_PASSWORDS["testpassword123"],
         full_name="Test User",
         role="auditor",
         is_active=True,
@@ -115,7 +146,7 @@ def test_admin_user(db, test_tenant):
     user = User(
         tenant_id=test_tenant.id,
         email="admin@example.com",
-        password_hash=hash_password("adminpassword123"),
+        password_hash=_TEST_PASSWORDS["adminpassword123"],
         full_name="Admin User",
         role="admin",
         is_active=True,
@@ -174,7 +205,7 @@ def second_tenant_user(db, second_tenant):
     user = User(
         tenant_id=second_tenant.id,
         email="second@example.com",
-        password_hash=hash_password("secondpassword123"),
+        password_hash=_TEST_PASSWORDS["secondpassword123"],
         full_name="Second User",
         role="auditor",
         is_active=True,

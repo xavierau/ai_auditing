@@ -234,7 +234,7 @@ class KBRetriever:
             # Calculate similarity score (1 - normalized_distance)
             # L2 distance is converted to similarity score [0, 1]
             distance = self._calculate_l2_distance(chunk.embedding, query_embedding)
-            similarity_score = max(0.0, 1.0 - (distance / 2.0))  # Normalize to [0, 1]
+            similarity_score = float(max(0.0, 1.0 - (distance / 2.0)))  # Convert to Python float
 
             formatted_results.append(
                 {
@@ -247,7 +247,7 @@ class KBRetriever:
                     "standard": kb_doc.standard,
                     "chunk_index": chunk.chunk_index,
                     "chunk_type": chunk.chunk_type,
-                    "confidence_score": chunk.confidence_score,
+                    "confidence_score": float(chunk.confidence_score) if chunk.confidence_score is not None else 0.0,  # Convert numpy types
                     "review_status": chunk.review_status,
                     "embedding_model": chunk.embedding_model,
                 }

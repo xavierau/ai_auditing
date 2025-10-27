@@ -32,8 +32,8 @@ class InventoryDisclosureSignature(dspy.Signature):
 class HKInventoryAgent(BaseFinancialAgent):
     """Hong Kong Inventory Agent."""
 
-    def __init__(self, market_config, retriever, tenant_id, user_id):
-        super().__init__(market_config, retriever, tenant_id, user_id)
+    def __init__(self, market_config, retriever, tenant_id, user_id, job_id=None):
+        super().__init__(market_config, retriever, tenant_id, user_id, job_id)
         self.dspy_module = dspy.ChainOfThought(InventoryDisclosureSignature)
 
     @property

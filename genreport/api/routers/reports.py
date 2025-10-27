@@ -5,7 +5,7 @@ All endpoints enforce tenant isolation and audit logging.
 """
 
 import logging
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 from datetime import datetime
 
@@ -48,13 +48,57 @@ class ReportSectionResponse(BaseModel):
     agent_name: str
     content: str
     standard_used: str
-    confidence_score: float
-    completeness_score: float
-    required_disclosures_met: dict
-    warnings: List[str]
+    confidence_score: float | None = None
+    completeness_score: float | None = None
+    required_disclosures_met: dict | None = None
+    warnings: List[str] = []
     pii_detected: bool
     pii_types: dict | None
     source_references: List[SourceReferenceResponse]
+
+    class Config:
+        from_attributes = True
+
+
+class WorksheetAnalysisResponse(BaseModel):
+    """Worksheet analysis response model."""
+    id: int
+    worksheet_name: str
+    is_summary: bool
+    is_supporting: bool
+    referenced_codes: List[str] | None = None
+    importance_score: float | None = None
+    summary: str | None = None  # LLM-generated worksheet summary
+    analysis_metadata: dict | None = None
+
+    class Config:
+        from_attributes = True
+
+
+class RelationshipMapResponse(BaseModel):
+    """Relationship map response model."""
+    id: int
+    coding_system: Optional[str] = None
+    code_families: Optional[List[dict]] = None  # List of CodeFamily dicts from JSON
+    relationships: Optional[dict] = None
+    recommended_sheets: Optional[List[str]] = None
+    confidence_score: Optional[float] = None
+
+    class Config:
+        from_attributes = True
+
+
+class FileMetadataResponse(BaseModel):
+    """File metadata response model."""
+    id: UUID
+    original_filename: str
+    file_size: int
+    mime_type: str | None = None
+    parsing_status: str
+    parsing_error: str | None = None
+    created_at: datetime
+    worksheet_analyses: List[WorksheetAnalysisResponse] = []
+    relationship_maps: List[RelationshipMapResponse] = []
 
     class Config:
         from_attributes = True
@@ -68,13 +112,14 @@ class GeneratedReportResponse(BaseModel):
     generated_by: int
     jurisdiction: str
     accounting_standard: str
-    overall_completeness: float
-    generation_time_seconds: float
-    cost_usd: float
+    overall_completeness: Optional[float] = None
+    generation_time_seconds: Optional[float] = None
+    cost_usd: Optional[float] = None
     status: str
-    error_message: str | None
+    error_message: Optional[str] = None
     created_at: datetime
     sections: List[ReportSectionResponse]
+    raw_data: Optional[FileMetadataResponse] = None
 
     class Config:
         from_attributes = True
@@ -188,7 +233,7 @@ async def generate_report(
         total_completeness = 0.0
 
         for section_name, output in agent_outputs.items():
-            # Create section
+            # Create section (only DB fields)
             section = ReportSection(
                 tenant_id=tenant_id,
                 report_id=report.id,
@@ -196,24 +241,33 @@ async def generate_report(
                 agent_name=output.agent_name if hasattr(output, 'agent_name') else section_name,
                 content=output.disclosure_text,
                 standard_used=output.standard_used if hasattr(output, 'standard_used') else project.accounting_standard,
-                confidence_score=output.confidence_score,
                 completeness_score=output.completeness_score,
                 required_disclosures_met=output.required_disclosures if hasattr(output, 'required_disclosures') else {},
-                warnings=output.warnings,
                 pii_detected=len(output.warnings) > 0 and any("PII" in w for w in output.warnings),
                 pii_types={} if not any("PII" in w for w in output.warnings) else {"detected": True},
             )
             db.add(section)
             db.flush()  # Get section.id
 
-            # Store source references
+            # Store source references (skip if KB chunks don't exist)
             source_refs = []
             for source in output.sources:
+                # Check if KB chunk exists before creating reference
+                from genreport.core.database.models import KBChunk
+                chunk_exists = db.query(KBChunk).filter(
+                    KBChunk.id == source.chunk_id,
+                    KBChunk.tenant_id == tenant_id
+                ).first() is not None
+
+                if not chunk_exists:
+                    logger.warning(f"Skipping source reference to non-existent chunk {source.chunk_id}")
+                    continue
+
                 source_ref = SourceReference(
                     tenant_id=tenant_id,
                     section_id=section.id,
-                    kb_chunk_id=source.get("chunk_id") or source.get("kb_chunk_id"),
-                    similarity_score=source.get("score", 0.0),
+                    kb_chunk_id=source.chunk_id,
+                    similarity_score=source.relevance_score,
                 )
                 db.add(source_ref)
                 source_refs.append(SourceReferenceResponse(
@@ -223,16 +277,17 @@ async def generate_report(
 
             total_completeness += output.completeness_score
 
+            # Build response with both DB fields and transient fields
             sections_data.append(ReportSectionResponse(
                 id=section.id,
                 section_name=section.section_name,
                 agent_name=section.agent_name,
                 content=section.content,
                 standard_used=section.standard_used,
-                confidence_score=section.confidence_score,
+                confidence_score=output.confidence_score,  # From agent output, not DB
                 completeness_score=section.completeness_score,
                 required_disclosures_met=section.required_disclosures_met,
-                warnings=section.warnings,
+                warnings=output.warnings,  # From agent output, not DB
                 pii_detected=section.pii_detected,
                 pii_types=section.pii_types,
                 source_references=source_refs,
@@ -317,7 +372,7 @@ async def get_report(
         db: Database session
 
     Returns:
-        Generated report with sections
+        Generated report with sections and raw parsing data
 
     Raises:
         HTTPException 404: Report not found
@@ -344,7 +399,32 @@ async def get_report(
             detail="Access denied",
         )
 
-    return report
+    # Fetch raw document parsing data for the project
+    from genreport.core.database.models import FileMetadata
+    file_metadata = db.query(FileMetadata).filter(
+        FileMetadata.project_id == report.project_id,
+        FileMetadata.tenant_id == tenant_id,
+    ).order_by(FileMetadata.created_at.desc()).first()
+
+    # Convert to response model with raw_data
+    report_dict = {
+        "id": report.id,
+        "tenant_id": report.tenant_id,
+        "project_id": report.project_id,
+        "generated_by": report.generated_by,
+        "jurisdiction": report.jurisdiction,
+        "accounting_standard": report.accounting_standard,
+        "overall_completeness": report.overall_completeness,
+        "generation_time_seconds": report.generation_time_seconds,
+        "cost_usd": report.cost_usd,
+        "status": report.status,
+        "error_message": report.error_message,
+        "created_at": report.created_at,
+        "sections": report.sections,
+        "raw_data": file_metadata if file_metadata else None,
+    }
+
+    return GeneratedReportResponse(**report_dict)
 
 
 @router.get("/project/{project_id}", response_model=List[GeneratedReportResponse])
@@ -393,7 +473,35 @@ async def list_project_reports(
         GeneratedReport.is_deleted == False,
     ).all()
 
-    return reports
+    # Fetch raw document parsing data for the project (most recent file)
+    from genreport.core.database.models import FileMetadata
+    file_metadata = db.query(FileMetadata).filter(
+        FileMetadata.project_id == project_id,
+        FileMetadata.tenant_id == tenant_id,
+    ).order_by(FileMetadata.created_at.desc()).first()
+
+    # Convert to response models with raw_data
+    response_reports = []
+    for report in reports:
+        report_dict = {
+            "id": report.id,
+            "tenant_id": report.tenant_id,
+            "project_id": report.project_id,
+            "generated_by": report.generated_by,
+            "jurisdiction": report.jurisdiction,
+            "accounting_standard": report.accounting_standard,
+            "overall_completeness": report.overall_completeness,
+            "generation_time_seconds": report.generation_time_seconds,
+            "cost_usd": report.cost_usd,
+            "status": report.status,
+            "error_message": report.error_message,
+            "created_at": report.created_at,
+            "sections": report.sections,
+            "raw_data": file_metadata if file_metadata else None,
+        }
+        response_reports.append(GeneratedReportResponse(**report_dict))
+
+    return response_reports
 
 
 @router.delete("/{report_id}")

@@ -1,4 +1,5 @@
-"""Integration tests for GenReport system.
+"""
+Integration and E2E Tests
 
-Tests complete workflows across multiple components.
+Sprint 6 Phase 1: End-to-end workflow testing
 """

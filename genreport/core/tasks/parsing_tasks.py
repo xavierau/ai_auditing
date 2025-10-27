@@ -4,6 +4,7 @@ This module implements background parsing tasks that maintain strict tenant isol
 and comprehensive error handling with retry logic.
 """
 
+import asyncio
 import logging
 import tempfile
 from pathlib import Path
@@ -186,24 +187,24 @@ def parse_excel_file_task(
             logger.info(f"Wrote temp file: {temp_file}")
 
             # Parse Excel file
-            logger.info("Starting preliminary scan...")
+            logger.info("Starting preliminary scan with async parallelization...")
             scanner = PreliminaryScanner()
-            result = scanner.analyze_workbook(str(temp_file))
+            scan_result = asyncio.run(scanner.analyze_workbook(str(temp_file)))
 
             logger.info(
-                f"Parsing complete: {len(result.get('worksheet_analyses', []))} worksheets analyzed"
+                f"Parsing complete: {len(scan_result.worksheet_analyses)} worksheets analyzed"
             )
 
             # Store results
             _store_worksheet_analyses(
-                db, project_id, result.get("worksheet_analyses", []), tenant_uuid
+                db, project_id, scan_result.worksheet_analyses, tenant_uuid
             )
             _store_relationship_map(
                 db,
                 project_id,
                 {
-                    "coding_system": result.get("coding_system"),
-                    "code_families": result.get("code_families"),
+                    "coding_system": scan_result.coding_system,
+                    "recommended_sheets": scan_result.recommended_sheets,
                 },
                 tenant_uuid,
             )
@@ -224,8 +225,10 @@ def parse_excel_file_task(
                 status="SUCCESS",
                 details={
                     "file_id": str(file_uuid),
-                    "worksheets_analyzed": len(result.get("worksheet_analyses", [])),
-                    "coding_system": result.get("coding_system"),
+                    "worksheets_analyzed": len(scan_result.worksheet_analyses),
+                    "total_sheets": scan_result.total_sheets,
+                    "recommended_sheets": scan_result.recommended_sheets,
+                    "coding_pattern": scan_result.coding_system.coding_pattern,
                 },
             )
 
@@ -234,8 +237,10 @@ def parse_excel_file_task(
             return {
                 "status": "success",
                 "project_id": project_id,
-                "worksheets_analyzed": len(result.get("worksheet_analyses", [])),
-                "coding_system": result.get("coding_system"),
+                "worksheets_analyzed": len(scan_result.worksheet_analyses),
+                "total_sheets": scan_result.total_sheets,
+                "recommended_sheets": scan_result.recommended_sheets,
+                "coding_pattern": scan_result.coding_system.coding_pattern,
             }
 
         finally:

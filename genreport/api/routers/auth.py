@@ -4,6 +4,7 @@ from datetime import datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import BaseModel, EmailStr
 from slowapi import Limiter
 from slowapi.util import get_remote_address
@@ -59,6 +60,23 @@ class RegisterRequest(BaseModel):
     jurisdiction: str = "HK"
 
 
+class UserData(BaseModel):
+    """User data model for responses."""
+
+    id: int
+    email: str
+    name: str
+    tenant_id: str
+    tenant_name: str
+    jurisdiction: str
+    role: str
+    is_active: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
 class TokenResponse(BaseModel):
     """Token response model."""
 
@@ -66,6 +84,7 @@ class TokenResponse(BaseModel):
     refresh_token: str
     token_type: str = "bearer"
     expires_in: int
+    user: UserData  # Add user data to response
 
 
 class RefreshRequest(BaseModel):
@@ -84,28 +103,33 @@ class LogoutRequest(BaseModel):
 @apply_rate_limit("5/minute")  # Prevent brute force attacks
 async def login(
     request: Request,
-    credentials: LoginRequest,
+    form_data: OAuth2PasswordRequestForm = Depends(),  # OAuth2 form data
     db: Session = Depends(get_db),
 ):
     """Authenticate user and return JWT tokens.
 
+    Supports OAuth2 password flow (form data with username/password).
     Rate limited to 5 attempts per minute to prevent brute force attacks.
 
     Args:
         request: FastAPI request
-        credentials: Email and password
+        form_data: OAuth2 form data (username field contains email)
         db: Database session
 
     Returns:
-        Access and refresh tokens
+        Access and refresh tokens with user data
 
     Raises:
         HTTPException: If authentication fails
     """
     ip_address = get_request_ip(request)
 
+    # OAuth2 uses 'username' field, but we use email
+    email = form_data.username
+    password = form_data.password
+
     # Authenticate user
-    user = authenticate_user(db, credentials.email, credentials.password)
+    user = authenticate_user(db, email, password)
 
     if not user:
         # Log failed attempt
@@ -130,15 +154,32 @@ async def login(
 
     # Generate tokens
     access_token = create_access_token(user.id, user.tenant_id, user.role)
-    refresh_token = create_refresh_token(user.id, user.tenant_id)
+    refresh_token_str = create_refresh_token(user.id, user.tenant_id)
 
     # Get token expiration from settings
     from genreport.core.utils.config import settings
 
+    # Get tenant info
+    tenant = db.query(Tenant).filter(Tenant.id == user.tenant_id).first()
+
+    # Prepare user data for response
+    user_data = UserData(
+        id=user.id,
+        email=user.email,
+        name=user.full_name,
+        tenant_id=str(user.tenant_id),
+        tenant_name=tenant.company_name if tenant else "Unknown",
+        jurisdiction=tenant.jurisdiction if tenant else "HK",
+        role=user.role,
+        is_active=user.is_active,
+        created_at=user.created_at,
+    )
+
     return TokenResponse(
         access_token=access_token,
-        refresh_token=refresh_token,
+        refresh_token=refresh_token_str,
         expires_in=settings.access_token_expire_minutes * 60,  # Convert to seconds
+        user=user_data,
     )
 
 
@@ -337,3 +378,25 @@ async def logout(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"Logout failed: {str(e)}",
         )
+
+
+@router.get("/csrf-token")
+async def get_csrf_token():
+    """Get CSRF token for the frontend.
+
+    Returns a simple CSRF token that the frontend can use.
+    In production, this should be more sophisticated with token validation.
+
+    Returns:
+        CSRF token
+    """
+    import secrets
+
+    # Generate a random token
+    csrf_token = secrets.token_hex(32)
+
+    return {"csrf_token": csrf_token}
+
+
+# Alternative route for frontend compatibility (matches /api/v1/csrf-token)
+# This is registered at the main app level, not in the auth router

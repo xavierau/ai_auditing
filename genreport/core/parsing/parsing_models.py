@@ -9,6 +9,42 @@ from enum import Enum
 from pydantic import BaseModel, Field, field_validator
 
 
+class CodeFamily(BaseModel):
+    """Represents a single code family in the coding system.
+
+    Example:
+        {
+            "prefix": "TB",
+            "category": "Trial Balance",
+            "description": "Trial balance worksheets",
+            "count": 5
+        }
+    """
+
+    prefix: str = Field(
+        ...,
+        description="Code prefix or identifier (e.g., 'TB', '1', 'A-100')",
+        min_length=1
+    )
+
+    category: str = Field(
+        ...,
+        description="Category or type of this code family (e.g., 'Trial Balance', 'Assets')",
+        min_length=1
+    )
+
+    description: Optional[str] = Field(
+        default=None,
+        description="Detailed description of this code family"
+    )
+
+    count: Optional[int] = Field(
+        default=None,
+        ge=0,
+        description="Number of worksheets in this family"
+    )
+
+
 class CodingSystemResult(BaseModel):
     """Result of Phase 1a: Coding system discovery.
 
@@ -32,10 +68,9 @@ class CodingSystemResult(BaseModel):
         examples=["A-B-C format", "Hierarchical numbering", "Alphanumeric codes"]
     )
 
-    code_families: List[Dict[str, Any]] = Field(
+    code_families: List[CodeFamily] = Field(
         ...,
-        description="Grouped code families with their characteristics",
-        examples=[[{"prefix": "1", "category": "Assets"}]]
+        description="Grouped code families with their characteristics"
     )
 
     confidence: float = Field(
@@ -142,7 +177,7 @@ class RelationshipMapResult(BaseModel):
         description="The discovered coding pattern"
     )
 
-    code_families: List[Dict[str, Any]] = Field(
+    code_families: List[CodeFamily] = Field(
         ...,
         description="Grouped code families"
     )

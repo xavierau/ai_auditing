@@ -15,8 +15,8 @@ class Source(BaseModel):
     Provides traceability from generated disclosure back to source material.
     """
 
-    document_id: UUID = Field(..., description="KB document UUID")
-    chunk_id: UUID = Field(..., description="Document chunk UUID")
+    document_id: int = Field(..., description="KB document ID (integer from database)")
+    chunk_id: int = Field(..., description="Document chunk ID (integer from database)")
     relevance_score: float = Field(
         ...,
         ge=0.0,
@@ -27,6 +27,10 @@ class Source(BaseModel):
         ...,
         min_length=1,
         description="Text snippet from the chunk",
+    )
+    source_reference: Optional[str] = Field(
+        None,
+        description="Formatted source reference (e.g., 'HKFRS 15, Section 31, p.58')",
     )
 
 

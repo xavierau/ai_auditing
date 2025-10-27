@@ -1,0 +1,655 @@
+
+--- Page 1 ---
+  
+Small and Medium -sized Entity  
+Financial Reporting Framework 
+and 
+Financial Reporting Standard  
+ 
+ 
+ SME -FRF & SME -FRS 
+Revised  September 2022 March  2025  
+ 
+ 
+ 
+The SME -FRF & SME -FRS has been updated to reflect the amendments of the 
+Companies (Amendment) (No. 2) Ordinance 2018. Please refer to paragraph 54 of 
+the SME -FRF for the effective date of the amendments.   Earlier application is not 
+permitted.  
+ 
+
+--- Page 2 ---
+SMALL AND MEDIUM -SIZED ENTITY FINANCIAL REPORTING  
+FRAMEWORK  AND FINANCIAL REPORTING STANDARD  
+© Copyright  i SME -FRF & SME -FRS (March  2025 ) Contents  
+ from paragraph 
+ SMALL AND MEDIUM -SIZED ENTITY  FINANCIAL REPORTING FRAMEWORK  
+  
+Scope  1 
+Users  4 
+Objective  5 
+Underlying Assumptions  6 
+Qualitative Characteristics  7 
+Elements  10 
+Recognition  15 
+Measurement  17 
+The new CO reporting exemption  19 
+Qualifying Entities  22 
+ Types of companies  24 
+ Size Tests 28 
+ Shareholder Approval  41 
+Transition ing  from a different GAAP to SME -FRF and SME -FRS 44 
+Realiz ed Profits  and Realized Losses  46 
+Effective Date  53 
+ 
+  
+SMALL AND MEDIUM -SIZED ENTITY FINANCIAL REPORTING STANDARD   
+  Definitions   
+Section 1  Presentation of Financial Statements  1.1 
+Section 2  Accounting Policies, Changes in Accounting Estimates and Errors  2.1 
+Section 3  Property, Plant and Equipment  3.1 
+Section 4  Intangible Assets  (other than goodwill)  4.1 
+Section 5  Leases  5.1 
+Section 6  Investments  6.1 
+Section 7  Inventories  7.1 
+Section 8  Construction Contracts  8.1 
+Section 9  Impairment of Assets  9.1 
+Section 10  Provisions, Contingent Liabilities and Contingent Assets  10.1 
+Section 11  Revenue  11.1 
+Section 12  Government Grants and Other Government Assistance  12.1 
+Section 13  Borrowing Costs  13.1 
+Section 14  Income Taxes  14.1 
+Section 15  The Effects of Changes in Foreign Exchange Rates  15.1 
+Section 16  Related  Party Disclosures  16.1 
+
+--- Page 3 ---
+SMALL AND MEDIUM -SIZED ENTITY FINANCIAL REPORTING  
+FRAMEWORK  AND FINANCIAL REPORTING STANDARD  
+© Copyright  ii SME -FRF & SME -FRS (March  2025 ) Section 17  Events After the End of the R eporting Period   17.1 
+Section 1 8 Business Combinations and Goodwill  18.1 
+Section 1 9 Consolidated and Company -level  Financial Statements  19.1 
+Section 20 Investments in Associates  20.1 
+Section 21 Interests in Joint Ventures  and Other Forms of Joint Arrangements  21.1 
+Section 22 Cash Flow Statement  (optional)  22.1 
+  
+  
+Appendix 1 Examples  of Application : 
+  
+Part A Recognition of provisions   
+Part B Revenue recognition   
+Part C Impairment allocation   
+Part D  New CO non-exempted disclosure requirements   
+Appendix 2 Illustrative Company -Level Financial Statements  Prepared in 
+Accordance with the SME -FRS  
+Appendix 3 Illustrative Consolidated Financial Statements  Prepared in 
+Accordance with the SME -FRS  
+  
+
+--- Page 4 ---
+SMALL AND MEDIUM -SIZED ENTITY FINANCIAL REPORTING  
+FRAMEWORK  AND FINANCIAL REPORTING STANDARD  
+© Copyright  iii SME -FRF & SME -FRS (March  2025 )  
+The Small and Me dium -sized Entity Financial Reporting Framework  (SME -FRF) and Financial 
+Reporting Standard (SME -FRS) are  standards of accounting practices issued by the Council of the 
+Hong Kong Institute of Certified Public Accountants pursuant to section 18A of the Professional 
+Accountants Ordinance  and the Company (Accounting Standards (Prescribed Body)) Regulation  
+issued under  section s 357 and 380 of the new Companies Ordinance (Cap. 622)  (“new CO”) . The 
+new CO came into effect on 3 March 2014. This version of the SME -FRF and SME -FRS takes into 
+account all relevant subsequent amendments to the new CO, up to and including the Companies 
+(Amendment) (No. 2) Ordinance 2018 which comes into effect on 1 Feb ruary 2019 ("the 2018 
+Amendment Ordinance").  
+SME -FRF and SME -FRS should be read in the context of the Preface to HKFRS Accounting Standards . 
+SME -FRS should also be read in the context of the SME -FRF. 
+Where the SME -FRF and SME -FRS make reference to requirements in the new CO, this is for information 
+purposes only and should not be relied upon to be a complete account of all the requirements of the  new 
+CO which may be relevant to a particular entity’s circumstances. Nothing in the SME -FRF or SME -FRS 
+should be taken as interpreting or amending the requirements set out in the new CO and if there is a 
+conflict between the SME -FRF or SME -FRS and the new CO,  then the new CO will prevail.  
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+COPYRIGHT  
+ 
+© Copyright 2025 Hong Kong Institute of Certified Public Accountants  
+ 
+This Small and Medium -sized Entity Financial Reporting Framework and Financial Reporting Standard 
+contains Hong Kong Institute of Certified Public Accountants copyright material. Reproduction in unaltered 
+form (retaining this notice) is permitted for personal and non -commercial use subject to the inclusion of an 
+acknowledgment of the  source. Requests and inquiries concerning reproduction and rights for commercial 
+purposes should be addressed to Hong Kong Institute of Certified Public Accountants, 37/F., Wu Chung 
+House, 213 Queen's Road East, Wanchai, Hong Kong.   
+ 
+
+--- Page 5 ---
+SMALL AND MEDIUM -SIZED ENTITY FINANCIAL REPORTING  
+FRAMEWORK  AND FINANCIAL REPORTING STANDARD  
+© Copyright  1 SME -FRF & SME -FRS (March  2025 ) SMALL AND MEDIUM -SIZED ENTITY FINANCIAL REPORTING FRAMEWORK  
+Scope  
+1. The new Companies Ordinance (Cap. 622) (“new CO”), which came into  effect on 3 March 
+2014, contains a n optional  reporting exemption for certain private companies and companies 
+limited by guarantee which satisfy the conditions set out in section 359 of the new CO.  On 7 
+December 2018, the Government of the Hong Kong  Special Administrative Region  published 
+the Companies (Amendment) (No. 2) Ordinance 2018 (“the 2018 Amendment Ordinance”) to 
+amend some of the provisions in the new CO so as to improve the clarity and operation of the 
+new CO and further facilitate business in Hong Kong .1 These amendments include 
+amendments relating to the eligibility criteria set out in section 359 of the new CO.  The Small 
+and Medium -sized Entity Financial Reporting Framework and Financial Reporting Standard 
+which are effective for annual periods beginning on or after 1 February  2019  (the “revised SME -
+FRF and FRS”) are the accounting standards issued by the HKICPA that are to be followed in 
+accordance with section 380(4) by those Hong Kong incorporated companies which are entitled 
+to, and decide to1a, take advantage of this reporting exemption in the new CO , as amended by 
+the 2018 Amendment Ordinance .  
+2. In accordance with paragraph 23 of the SME -FRF, a n entity which is not  a company 
+incorporated under either the new CO or any former  CO, subject to any specific requirements 
+imposed by the law of the entity’s place of incorporation and subject to its constitution, qualifies 
+for reporting under the SME -FRF when the entity meets the same requirements that a Hong 
+Kong incorporated entity is required to meet under section 359 of the new CO.  
+3. The revised SME -FRF sets out the following:  
+(a) the conceptual basis for the preparation of financial statements in accordance with the 
+SME -FRS (paragraphs 4-18)  
+(b) an overview of the reporting exemption introduced in the new CO  (paragraphs 19 to 
+21) 
+(c) the qualifying criteria  (paragraphs 22-43) for the reporting exemption ;  
+(d) guidance on transitioning from a different GAAP to SME -FRF and FRS  (paragraphs 
+44-45); and  
+(e) guidance on the extent to which profits or losses recognised under the SME -FRF and 
+FRS may be regarded as realized profits or losses for the purposes of making a 
+distribution in accordance with section 297 of the new CO (paragraphs 4 6 to 52). 
+  
+ 
+1  Source : press release issued by the Government of the Hong Kong Special Administrative Region on 7 December 2018 . 
+1a The reporting exemption is optional for those companies which are eligible. If a non -dormant private company or company 
+limited by guarantee is not eligible, or decides not to take advantage of the reporting exemption, then it should prepare 
+financial statements which comply with all the relevant requirements o f the new CO, including subsections (1) -(6) of section 
+380. Subsections (1), (2), (5) and (6) of section 380 relate to the requirement for the financial statements to give a true a nd 
+fair view of the financial position of the company (or the company and all its subsidiary undertakings, as the ca se may be) 
+as at the end of the financial year and the financial performance of the company (or the company and all its subsidiary 
+undertakings, as the case may be) for the financial year. Subsection (4) of section 380 requires compliance with the 
+accounti ng standards applicable to the financial statements.  In the case of a company not taking advantage of the reporting 
+exemption, this would be HKFRS Accounting Standards  or HKFRS for Private Entities  Accounting Standard  as issued by 
+the HKICPA.  
+
+--- Page 6 ---
+SMALL AND MEDIUM -SIZED ENTITY FINANCIAL REPORTING  
+FRAMEWORK  AND FINANCIAL REPORTING STANDARD  
+© Copyright  2 SME -FRF & SME -FRS (March  2025 ) Users  
+4. Users of financial statements generally include present and potential investors, employees, 
+lenders, suppliers and other trade creditors, customers, governments and their agencies and, 
+in some cases, the public. For SMEs  incorporated in Hong Kong , the most significant users are 
+likely to be owners, government  (in the form of the Inland Revenue Department)  and creditors  
+(such as banks) , who may have the power to obtain information additional to that contained in 
+the financial statements. Management is also i nterested in the information contained in the 
+financial statements, even though it has access to additional management and financial 
+information.  
+Objective  
+5. The objective of financial statements is to provide information about the financial position and 
+performance of an entity that is useful to users of such information. Financial statements show 
+the results of management’s stewardship of and accountability f or the resources entrusted to  
+it. 
+Underlying Assumptions  
+6. Financial statements are prepared on the accrual basis of accounting. They are normally 
+prepared on the assumption that an entity is a going concern and will continue to operate for 
+at least the foreseeable future.  
+Qualitative Characteristics  
+7. Qualitative characteristics are the attributes that make the information provided in financial 
+statements useful to users. The four principal characteristics are:  
+(a) Understandability : It is essential that information provided in financial statements is 
+readily understandable by users.  
+(b)  Relevance : To be useful, information must be relevant to the needs of users. The 
+relevance of information is affected by its nature and materiality.  
+(c) Reliability : Information is reliable when it is free from material error and bias and can 
+be depended on by users to represent faithfully that which it is said to represent. In 
+assessing reliability, substance over form, prudence, neutrality and completeness are 
+also considered.  
+(d) Comparability : Users must be able to compare the financial statements of an entity 
+over time in order to identify trends in the entity’s financial position and performance.  
+8. Constraints : The balance between benefit and cost is a pervasive constraint rather than a 
+qualitative characteristic. The benefits derived from information should exceed the cost  of 
+providing it. The evaluation of benefits and costs is, however, substantially a judgmental 
+process. Users of financial statements should be aware of this constraint.  
+9. In practice, trade -offs between qualitative characteristics are often necessary. Determining the 
+relative importance of the characteristics in different cases is a matter of professional judgment.  
+Elements  
+10. An “asset ” is a resource controlled by the entity as a result of past events and from which future 
+economic benefits are expected to flow to the entity.  
+11. A “liability ” is a present obligation of the entity arising from past events, the settlement of which 
+is expected to result in an outflow from the entity of resources embodying economic benefits.  
+  
+
+--- Page 7 ---
+SMALL AND MEDIUM -SIZED ENTITY FINANCIAL REPORTING  
+FRAMEWORK  AND FINANCIAL REPORTING STANDARD  
+© Copyright  3 SME -FRF & SME -FRS (March  2025 ) 12. “Equity”  is the residual interest in the assets of the entity after all its liabilities have been 
+deducted.  
+13. “Income”  encompasses both revenue and gains. It includes increases in economic benefits 
+during the accounting period in the form of inflows or enhancements of assets as well as 
+decreases of liabilities that result in increases in equity, other than those relating t o 
+contributions from equity participants.  
+14. “Expenses”  encompass losses as well as those expenses that arise in the course of the 
+ordinary activities of the entity. Expenses are decreases in economic benefits.  
+Recognition  
+15. An item that meets the definition of an element should be recognised if (a) it is probable that 
+any future economic benefit associated with the item will flow to or from the entity ; and (b) the 
+item has a cost or value that can be measured with reliability. The interrelationship between 
+the elements means that an item that meets the definition and recognition criteria for a 
+particular element, for example, an asset, automatically req uires the recognition of another 
+element, for example, income or a liability.  
+16. Recognition of an item as income or expense in accordance with the SME -FRS does not 
+necessarily result in that item being “realiz ed” within the meaning of section 291  of the new 
+CO. Consequently, a  profit which is recognised for accounting purposes under the SME -FRS 
+may not necessarily be capable of distribution to shareholders by way of a dividend. The 
+concept of “realiz ed profits and losses” and their relationship to profits and losses as recognised 
+under the SME -FRS is dealt with in paragraphs  46 to 52 of the SME -FRF.  
+Measurement  
+17. The measurement base most commonly adopted by entities in preparing their financial 
+statements is historical cost. This may be combined with other measurement bases for certain 
+specific items, as referred to in the SME -FRS (for example, Section 1 5 The Effects of Changes 
+in Foreign Exchange Rates ). 
+18. Under the historical cost convention:  
+(a) assets are recorded at the amount of cash or cash equivalents paid or the fair value of 
+the consideration given to acquire them at the time of their acquisition; and  
+(b) liabilities are recorded at the amount of proceeds received in exchange for the 
+obligation, or in some circumstances (for example, income taxes), at the amounts of 
+cash or cash equivalents expected to be paid to satisfy the liability in the normal course 
+of business.  
+ Assets should not be revalued nor should future cash flows be discounted in the measurement 
+of assets and liabilities except when required or permitted by the SME -FRS.  
+The new CO reporting exemption  
+19. The new CO permits private companies  and companies limited by guarantee to take advantage 
+of a “reporting exemption ” if they meet certain qualifying criteria set out in section 359 . The 
+reporting exemption takes the form of exemption from certain of the requirements for the 
+content s of the directors’ report and financial statements that would  apply if the entities did not 
+qualify for exemption.   
+  
+
+--- Page 8 ---
+SMALL AND MEDIUM -SIZED ENTITY FINANCIAL REPORTING  
+FRAMEWORK  AND FINANCIAL REPORTING STANDARD  
+© Copyright  4 SME -FRF & SME -FRS (March  2025 ) 20. Of these exemptions, the most significant one for the purposes of the SME -FRS is the 
+exemption from the requirement for the financial statements to give a true and fair view as set 
+out in section 380(7) of the new CO. Instead, financial statements prepared by entities taking 
+advantage of the reporting exemption are required to be properly prepared in accordance with 
+the applicable accounting standards issued or specified by the HKICPA  under sections 357(1) 
+and 380(4)(b) , as the prescribed body under the Com pany (Accounting Standards (Prescribed 
+Body)) Regulation  (Cap. 622C)  as amended  by the 2018 Amendment Ordinance effective from  
+February 2019 . For the purposes of section 380(4)(b) , the SME -FRF and SME -FRS are the 
+applicable  accounting standards.  
+21. Unless specifically exempt from a particular requirement, the financial statements and 
+directors’ report prepared by a qualifying entity  are required to follow the same requirements 
+as apply to full financial statements and directors’  reports. Further details of t hese non -exempt 
+disclosure requirements which apply under the new CO are set out in  Part D of Appendix 1 to 
+the SME -FRS.  
+Qualifying Entities  
+22. A company incorporated under the new or a former  CO qualifies for reporting under the SME -
+FRF2 if it satisfies the criteria set out in section 359 of the new CO  and the sections and 
+Schedules to which that section refers .  Specifically:  
+(a) Section  359(1)(b) brings forward the qualifying criteria that were previously found in 
+section 141D of the predecessor  CO, relating to private companies which do not have 
+subsidiaries and are not a subsidiary of another company. These companies (unless 
+they fall within the types of companies listed in paragraph 27 below) are eligible for the 
+reporting exemption provided t hat they obtain 100% agreement  in writing from their 
+shareholders  for the financial year . 
+(b) The remainder of section 359 introduces 4 categories of entities (or groups) that fall 
+within the reporting exemption if they meet certain criteria  relating to the type of entity  
+(or group) , the size of the entity  (or group)  and in certain cases the need for shareholder 
+approval. Further details on these criteria are set out in paragraphs 24 to 43 below.  
+(c) Qualifying  groups may consist of Hong Kong and non -Hong Kong incorporated  body 
+corporate s. 
+23. An entity which is not  a company incorporated under either the new CO or  a former  CO, subject 
+to any specific requirements imposed by the law of the entity’s place of incorporation and 
+subject to its constitution, qualifies for reporting under the SME -FRF when the entity meets the 
+same requirements that a Hong Kong incorporated entity is required to meet under section 359 
+of the new CO.  
+Types of companies   
+24. Only certain types of companies can qualify for the reporting exemption under the new CO. At 
+a minimum, in accordance with section 359 of the new CO these companies  must be private 
+companies  or companies  limited by guarantee.   
+25. According to section 11 of t he new CO , a company  that is not limited by guarantee  is a “private 
+company” if its articles:  
+(a) restrict a member’s right to transfer shares; and  
+(b) limit the number of its members to 50; and  
+ 
+2  As stated in footnote 1 a to the SME -FRF, taking advantage of the reporting exemption is optional even if the company 
+qualifies. If a company which is eligible does not take advantage of the reporting exemption then its financial statements 
+should comply with HKFRS Accounting Standards  as issued by the HKICPA instead of the SME -FRF. Further details are 
+stated in footnote 1 a. 
+
+--- Page 9 ---
+SMALL AND MEDIUM -SIZED ENTITY FINANCIAL REPORTING  
+FRAMEWORK  AND FINANCIAL REPORTING STANDARD  
+© Copyright  5 SME -FRF & SME -FRS (March  2025 ) (c) prohibit any invitation to the public to subscribe for any shares or debentures of the 
+company . 
+The new CO clarifies that the term “ member ” above excludes employees of the company and 
+former employees, who became members whilst they were employees of the company and 
+who continue to be members. Also, if two or more people own shares in a company jointly they 
+are regarded as one single member.  
+According to section 382 of the new CO, if at any time during the financial year a private 
+company breaches any of the above criteria then it is required to prepare its financial 
+statements as if it were a public company i.e. it will no longer qualify for the reporting exemption, 
+unless the Court allows otherwise.  
+26. According to section 9 of the new CO, a  company is “limited by guarantee” under the new CO 
+if: 
+(a) it does not have a share capital; and  
+(b) its articles limit the liability of its members to the amount its members undertake , by 
+those articles,  to contribute to the assets of the company if it is wound up.  
+27. According to section 359(4) of the new CO, the following companies are not permitted to take 
+the reporting exemption : 
+(a) the entity  carries on any banking business and holds a valid banking licence granted 
+under the Banking Ordinance (Cap. 155) ;   
+(b)  the entity accepts, by way of trade or business (other than banking business) loans of 
+money at interest or repayable at a premium, other than on terms involving the issue 
+of debentures or other securities ; 
+(c) the entity is  a corporation licensed  under Part V of the Securities and Futures 
+Ordinance (Cap. 571) to carry on a business in any regulated activity within the 
+meaning of that Ordinance ; or 
+(d) the entity carries on any insurance business, other wise than solely as an agent . 
+27A. According to section s 359(3)(b), 359(3A) and  359(5) of the new CO, a holding company is  not 
+permitted to take the reporting exemption  when the group  of which it is the holding company 
+includes a company specified in section 359(4) (i.e. includes one of the types of companies set 
+out above in paragraph 27) or includes  a non -Hong Kong body corporate that:  
+(a) carries on any business that, had it been carried on in Hong Kong, would be required  
+to be carried on under  a valid banking licen ce granted under the Banking Ordinance 
+(Cap. 155);  
+(b) accepts, by way of trade or business (other than banking business) loans of money at 
+interest or repayable at a premium, other than on terms involving the issue of 
+debentures or other securities;  
+(c) carries on any business that, had it been carried on in Hong Kong, would be required  
+to be carried on under  a licen ce under Part V of the Securities and Futures Ordinance 
+(Cap. 571) to carry on a business in any regulated activity within the meaning of that 
+Ordinance;  
+(d) carries on any insurance business, other wise than solely as an agent; or  
+(e) would have fallen within the meaning of public company in section 12 of the new CO 
+had it be en incorporated under the new CO.  
+
+--- Page 10 ---
+SMALL AND MEDIUM -SIZED ENTITY FINANCIAL REPORTING  
+FRAMEWORK  AND FINANCIAL REPORTING STANDARD  
+© Copyright  6 SME -FRF & SME -FRS (March  2025 ) Size tests  
+28. There are 4 sets of size tests set out in Schedule 3 to the new CO which are used to define the 
+following types of entity  for the purposes of the reporting exemption : 
+(a) small guarantee companies (or a group of small guarantee companies  which may 
+include non-Hong Kong body corporate s); 
+(b) small private companies (or a group of small private companies  which may include  
+non-Hong Kong body corporate s); 
+(c) larger “eligible” private companies (or a group of “eligible ” companies  which may 
+include  non-Hong Kong body corporate s); 
+(d) mixed group ( being a group comprising  a mix of (i) one or more  small  and/or eligible  
+private companies and (ii) one or more small guarantee companies)  which may include 
+non-Hong Kong body corporates . 
+As explained in paragraph 22 above, consistent with section 141D of the predecessor  CO, 
+private companies which do not have subsidiaries and are not a subsidiary of another company 
+do not need to meet any size test in order to qualify under section 359(1)(b)  of the new CO , 
+provided that they obtain 100% agreement  from their shareholders  for the financial year .   
+29. If a parent is not exempt from preparing consolidated financial statements in accordance with 
+section 379 (3) of the new CO, the n the parent , each company in the group  and the  group of 
+which it is the parent as a whole must meet the relevant size tests  in order for the parent to 
+prepare consolidated financial statements in accordance with the SME -FRS.  
+Meeting the size tests in the first year that the new Companies Ordinance applied 
+30. Sub-section (2 ) of each of sections 361 to 366 of the new CO (as applicable)  sets out  the 
+transitional requirements which appl ied in the first financial year after the new CO first came  
+into operation, i.e. in the first financial year which began on or after 3 March 2014 . In 
+accordance with sub -section (2) of each of sections 361 to 366 of the new CO (as applicable), 
+the entity  qualif ied for the reporting exemption for the first financial year beginning on or after 
+3 March 2014 if it met the relevant size tests:  
+(a) in that first financial year; or  
+(b) in the immediately preceding financial year.  
+ If the entity qualified in the first financial year in accordance with the above , it will have 
+continue d to qualify  until it is disqualified in accordance with sub -section (4) or (5) (as set out 
+in paragraph s 32 and 33  below).  
+Meeting the size tests for mixed group s in the first year that section 366A applies  
+30A. The qualifying  category of "mixed group", as described in paragraph 28(d) above, was 
+introduced into the new CO by way of the 2018 Amendment Ordinance, specifically by way of 
+new sections 359(3A) and 366A. Sub-section (1)(c) of section 366A of the new CO sets out the 
+transitional requirements which apply in the first financial year after th is section comes into 
+operation, i.e. in the first financial year beginning on or after 1 February 2019. In accordance 
+with sub -section (1)(c) of section 366A of the new CO, a mixed  group will qualify for the 
+reporting exemption for the first financial year beginning on or after 1 February 2019 if it meets 
+the relevant size tests:  
+(a) in that first financial year; or  
+(b) in the immediately preceding financial year.  
+
+--- Page 11 ---
+SMALL AND MEDIUM -SIZED ENTITY FINANCIAL REPORTING  
+FRAMEWORK  AND FINANCIAL REPORTING STANDARD  
+© Copyright  7 SME -FRF & SME -FRS (March  2025 ) If the mixed group qualifies in the first financial year in accordance with the above, it will 
+continue to qualify until it is disqualified in accordance with sub -section (6) or (7) (as set out in 
+paragraphs 32 and 33 below).  Paragraph 39A below sets out further  detail on how to identify 
+which is relevant size test for a mixed group.  
+Meeting the size tests in all subsequent financial years  
+31. In accordance with sub -section (3) of each of sections 361 to 366 , or sub -section  (5) of section 
+366(A),  of the new CO (as applicable), an entity /a group of companies  which was previously 
+disqualified on the grounds of its size will need to meet the size tests for two consecutive 
+reporting periods, before it will qualify for the reporting exemption in the third reporting period, 
+regardless of its size in that period .  
+32. In accordance with sub -section (4) of each of sections 361 to 363, or sub -section (5) of each 
+of sections 364 to 366, or sub -section  (7) of section 366(A), of the new CO (as applicable), 
+where an entity has previously qualified for the reporting exemption in terms of its size, the 
+entity will continue to qualify for the reporting exemption even when it no longer meets the 
+relevant size tests, unless the entit y has failed the size tests for two consecutive reporting 
+periods. It will then fail to qualify for the reporting exemption in the third reporting period, 
+regardless of its size in that period . 
+33. An exception to this two year grace period for losing entitlement is where a new company  or a 
+non-Hong Kong body corporate  enters the group. In this case, in accordance with  sub-section 
+(4) of each of sections 364 to 366 , or sub -section  (6) of section 366(A),  of the new CO (as 
+applicable), the group will no longer be eligible for the reporting exemption in the year in which 
+the new company  or non -Hong Kong body corporate  enters the group, if that new subsidiary is 
+of such a size that the group fails the size tests in that year.  
+Size tests for s mall guarantee companies (or a group of small guarantee companies  which may include  
+non-Hong Kong body corporate s)  
+34. According to paragraph 1(5) of Schedule 3,  a company  limited by guarantee  qualifie s as a small 
+guarantee company if its total annual revenue  does not exceed HK$25 million . 
+35. According to paragraph s 1(13)  and 12A(b)  of Schedule 3 , in order to qualify for the reporting 
+exemption as a group of small guarantee companies:  
+(a) each company in the group must qualify as a small guarantee company; and  
+(b) each non -Hong Kong body corporate in the group  (if any) would have been qualified 
+as a small guarantee company for the financial year had it been incorporated under 
+the new CO; and  
+(c) the aggregate annual revenue of the group must not exceed HK$25 million .  
+Size tests for s mall private  companies (or a group of small private  companies  which may include  non-
+Hong Kong body corporate s)  
+36. According to paragraph  1(1) of Schedule 3 , a private company qualifie s as a small private 
+company if does not exceed any two of the following : 
+(a) total annual revenue of HK$ 100 million  
+(b) total assets of HK$ 100 million  at the end of the reporting period  
+(c) 100 employees  
+  
+
+--- Page 12 ---
+SMALL AND MEDIUM -SIZED ENTITY FINANCIAL REPORTING  
+FRAMEWORK  AND FINANCIAL REPORTING STANDARD  
+© Copyright  8 SME -FRF & SME -FRS (March  2025 ) 37. According to paragraph s 1(8) and 7(b) of Schedule 3,  in order t o qualify for the reporting 
+exemption as a group of small private  companies:  
+(a) each company in the group must qualify as a small private  company;  
+(b) each non-Hong Kong body corporate in the group  (if any)  would have been qualified 
+as a small private company for the financial year had it been incorporated under the 
+new CO; and  
+(c) the aggregate amounts for the group in total must not exceed 2 out of 3 of the small 
+size tests . 
+Size tests for l arger “eligible” private companies (or a group of “eligible ” companies  which may include  
+non-Hong Kong body corporate s)  
+38. According to paragraph 1(3) of Schedule 3 , a private company may qualif y as an “eligible” 
+private company if does not exceed any two of the following : 
+(a) total annual revenue of HK$ 200 million  
+(b) total assets of HK$ 200 million  at the end of the reporting period  
+(c) 100 employees  (not 200 employees)  
+In addition, in order to qualify, the company must meet the shareholder approval requirements 
+as set out in paragraphs 41 -42 below.  
+39. According to paragraph s 1(11) , 7(b)  and 10(b)  of Schedule 3 , in order t o qualify for the reporting 
+exemption as a group of “eligible ” companies:  
+(a) each company in the group must meet the size tests as either a small private  company  
+or a larger “eligible” private company ;  
+(b) each non -Hong Kong body corporate  in the  group  (if any)  would have been qualified 
+as either a small private company or  a larger  "eligible " private  company for the financial 
+year had it been incorporated  under the new CO  on basis of its size ; and  
+(c) the aggregate amounts for the group in total must not exceed 2 out of 3 of the larger 
+“eligible” size tests.  
+In addition, the company which is the holding company in this group must meet the shareholder 
+approval requirements as set out in paragraphs 41 -42 below.  
+Size tests for mixed group s which may include  non-Hong Kong body corporates   
+39A. The relevant size tests for a mixed group depend on the status of the holding company in that 
+group. Specifically, the requirements in this regard are set out in  sub-section (4) of section 
+366(A) of the new CO  and are as follows : 
+(a) If the holding company  in that mixed group  is a small private company, the aggregate 
+amounts for the  mixed  group in total must not exceed 2 out of 3 of the size tests  for a 
+group  of small private companies  as set out in paragraph 36 above . 
+
+--- Page 13 ---
+SMALL AND MEDIUM -SIZED ENTITY FINANCIAL REPORTING  
+FRAMEWORK  AND FINANCIAL REPORTING STANDARD  
+© Copyright  9 SME -FRF & SME -FRS (March  2025 ) (b) If the holding company  in that mixed group  is an eligible private company, the 
+aggregate amounts for the mixed group in total must not exceed 2 out of 3 of the size 
+tests  for a group  of larger "eligible " companies  as set out in paragraph 38 above2a.  
+(c) If the holding company  in that mixed group  is a small guarantee company, the 
+aggregate annual revenue of the mixed group must not exceed HK$25 million.  
+Interpretative guidance in Schedule 3 of the new CO  
+40. For the purposes of the size tests  for all four categories of qualifying entities , Schedule 3 to the 
+CO states that : 
+(a) the total revenue and total assets are  those reflected in the annual financial  statements 
+for the financial year2b;  
+(b) in the case where the reporting period is shorter or longer than a year, the amount of 
+total revenue for a financial year is to be calculated on a pro -rata basis as if the length 
+of the financial year were 12 months ; 
+(c) in the case where the entity is a group, the aggregate total annual revenue and 
+aggregate total assets are calculated after eliminating int ragroup transactions and 
+balances ; and 
+(d) the number of employees is the average number of persons employed by the entity 
+during the reporting period (irrespective of whether in full -time or part -time 
+employment) determined on a monthly basis as follows:  
+(i) Determine the number of employees as at the end of each calendar month.  
+(ii) Add together all the monthly numbers in (i).  
+(iii)  Divide the number in (ii) by the number of months in the reporting period.  
+Shareholder approval  
+41. Subject to anything to the contrary in the Articles of a company, shareholder  approval is not 
+required  to be obtained by a company wishing to take advantage of the reporting exemption  
+under the CO  if the company is a  small guarantee compan y (or group) , a small private compan y 
+(or group)  or a mixed group  which does not exceed the small private company size limits or 
+small guarantee size limits as applicable under section 366A(4) as set out in paragraph 39A 
+above .  
+42. In accordance with section 360 of the new CO, t he shareholder approval requirements for 
+larger “eligible” private companies or groups are as follows:  
+(a) to gain exemption as a larger “eligible”  private company  or group  at least 75% of all 
+the members  of the company  or the holding company of the group (as the case may 
+be) must pass a resolution at a general meeting that the company  or the holding 
+company  is to fall within the reporting exemption for the financial year ; and  
+(b) none of the members holding the remaining voting rights in that company  or the holding 
+company  vote against the resolution . 
+  
+ 
+2a These size tests for larger "eligible" groups would also apply to mixed groups if the holding company of the mixed group is 
+a private company and the mixed group in total exceeds the size tests for a group of small private companies as set out in 
+paragraph 36 above.  
+2b See paragraphs 2 and 3 of Schedule 3 to the CO for details on determination of total revenue a nd total assets for the purpose  
+of the size tests for the reporting exemption.  
+
+--- Page 14 ---
+SMALL AND MEDIUM -SIZED ENTITY FINANCIAL REPORTING  
+FRAMEWORK  AND FINANCIAL REPORTING STANDARD  
+© Copyright  10 SME -FRF & SME -FRS (March  2025 ) The 75% vote is calculated as a percentage of the entire shareholding of the company  seeking 
+to use the reporting  exemption , not simply as a percentage of the shareholders  of that company  
+who attend the general meeting.  The resolution is defeated if any member  of that company  
+objects either at the meeting or at any time by giving notice in writing to the company, provided 
+that the written notice is given at least 6 months before the end of the financial year to which 
+the objection relates.  
+42A. As a result of the 2018 Amendment Ordinance, for the purposes of preparing consolidated 
+financial statements of a larger “eligible” group under the SME -FRS, it is sufficient for the 
+holding company seeking to make use of the reporting exemption to obtain t he above approval 
+from its own shareholders. It is no longer necessary for the holding company to also obtain 
+shareholder approval from the shareholders of any of its subsidiaries, even if those subsidiaries 
+exceed the small size limits and are therefore a lso “eligible” private companies in their own 
+right. Such approval from the subsidiary’s shareholders need only be obtained if those larger 
+“eligible” subsidiaries wish to take advantage of  the reporting exemption when preparing their 
+own financial statements.  
+43.  As stated in paragraph  22 above, p rivate companies which do not have subsidiaries and are 
+not a subsidiary of another company do not need to meet any size test in order to qualify under 
+section 359(1)(b) of the new CO, provided that each year they obtain 100% approval from their 
+shareholders.  This approval must be in writing and can only be given for one year at a time.  
+Transitioning from a different GAAP to SME -FRF and SME -FRS 
+44. The transition  from the entity's previous GAAP  (for example the transition from reporting in 
+accordance with HKFRS Accounting Standards ) to the SME -FRF and SME -FRS is accounted 
+for as follows:  
+(a) All items recognised previously under a different GAAP (for example, deferred tax 
+liability) which do not meet the recognition criteria under the SME -FRF and SME -FRS 
+are to be derecognised and dealt with as a change of accounting policy under  section 
+2 of the SME -FRS.  
+(b) All items not recognised previously under a different GAAP which meet the recognition 
+criteria under the SME -FRF and SME -FRS3 are to be recognised in accordance with 
+the relevant section of the SME -FRS and dealt with as a change of accounting policy 
+under section 2 of the SME -FRS.  
+(c) All items recognised under the entity's previous GAAP, which meet the recognition 
+criteria under the SME -FRF and SME -FRS, but which were  previously measured on a 
+basis inconsistent with the SME -FRF and SME -FRS (for example, unamortised 
+goodwill) are to be re -measured in accordance with the relevant section of the SME -
+FRS and dealt with as a change of accounting policy under section 2 of the SME -FRS. 
+An entity may also use t he following e xemption s for each class of property, plant and 
+equipment4 or intangible assets  in preparing its first financial statements that conform  
+to the SME -FRF and SME -FRS:  
+ 
+(i) Previous GAAP c arrying amount  as deemed cost: An entity may elect to 
+measure all items in each class of assets at their previous GAAP carrying 
+amount on transition; or  
+ 
+(ii) Fair value as deemed cost: An entity may elect to measure all items in each 
+class of assets at their fair value on transition.  
+  
+ 
+3  Such items are not expected to arise on a transition from full HKFRS  Accounting Standard s to SME -FRF and SME -FRS but 
+are included here for the sake of completeness.  
+4  The definition of property, plant and equipment in the SME -FRS includes property classified as investment property applying 
+HKFRS Accounting Standards or the HKFRS for Private Entities  Accounting Standard . 
+
+--- Page 15 ---
+SMALL AND MEDIUM -SIZED ENTITY FINANCIAL REPORTING  
+FRAMEWORK  AND FINANCIAL REPORTING STANDARD  
+© Copyright  11 SME -FRF & SME -FRS (March  2025 ) 45. When an entity transitions from a different GAAP to the SME -FRF and SME -FRS it should 
+disclose the following in the year of transition:  
+(a) the fact that this is the first year that the entity has adopted the SME -FRF and SME -
+FRS;  
+(b) the previous accounting framework adopted by the entity in its annual financial 
+statements;  
+(c) a reconciliation of net assets as reported in the previous annual financial statements 
+and net assets reported as of the same date under the SME -FRF and SME -FRS, 
+showing separately:  
+(i) any items derecognised because they do not meet the recognition criteria 
+under the SME -FRF and SME -FRS;  
+(ii) any items recognised for the first time because they meet the recognition 
+criteria under the SME -FRF and SME -FRS but were not recognised under the 
+previous accounting framework;  and 
+(iii) the amount by which any items have been re -measured as a result of adopting 
+the measurement requirements of the SME -FRF and SME -FRS.  
+ This reconciliation should be presented for the opening balances of the current 
+period and any comparative period presented which have been restated as a 
+result of transitioning to the SME -FRF and SME -FRS; and  
+(d) if any opening balances have not been restated because it would require undue cost 
+or effort to do so, this fact.  
+Realiz ed Profits  and Realized Losses  
+46. Consistent with section 79A of the predecessor  CO (Cap. 32), s ection 297 of the new CO states 
+that a company may only make a distribution out of profits available for distribution and that, 
+for the purposes of this section, a company’s profits available for distribution are its 
+accumulated, realized profits, so far a s not previously utilized by distribution or capitalization, 
+less its accumulated, realized losses, so far as not previously written off in a reduction or 
+reorganisation of capital. Such distributable profits are to be computed at the company -level, 
+irresp ective of whether the company prepares consolidated financial statements . 
+47. Also consistent with section 79A of the predecessor CO, section 291 of the new CO states that 
+a reference to realized profits or losses of a company is a reference to those profits or losses 
+of the company that are regarded as realized for the purposes  of any financial statements 
+prepared by the directors in accordance with principles generally accepted, at the time when 
+the financial statements were prepared, with respect to the determination for accounting 
+purposes of realized profits or realized loss es. 
+48. In accordance with Accounting Bulletin 4 “ Guidance on the Determination of Reali zed Profits 
+and Losses in the Context of Distributions under the Hong Kong Companies Ordinance ” issued 
+by the HKICPA, a profit shall be treated as reali zed only when reali zed in the form of:  
+(a) cash; or  
+(b) other assets, the ultimate cash reali zation of which can be assessed with reasonable 
+certainty.  
+49. Most transactions recognised under the SME -FRS in company -level financial statements would 
+satisfy this test. For example, a sale of inventory on normal credit terms will still give rise to a 
+realized profit at the point of sale if the debtor is capable of settling the receivable within a 
+reasonable period of time and  there is a reasonable certainty that the debtor will be capable of 
+settling when called upon to do so.  
+  

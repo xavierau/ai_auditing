@@ -1,0 +1,158 @@
+[
+  {
+    "section_number": "1",
+    "title": "Presentation of Financial Statements",
+    "page_ref": "1.1",
+    "type": "section"
+  },
+  {
+    "section_number": "2",
+    "title": "Accounting Policies, Changes in Accounting Estimates and Errors",
+    "page_ref": "2.1",
+    "type": "section"
+  },
+  {
+    "section_number": "3",
+    "title": "Property, Plant and Equipment",
+    "page_ref": "3.1",
+    "type": "section"
+  },
+  {
+    "section_number": "4",
+    "title": "Intangible Assets  (other than goodwill)",
+    "page_ref": "4.1",
+    "type": "section"
+  },
+  {
+    "section_number": "5",
+    "title": "Leases",
+    "page_ref": "5.1",
+    "type": "section"
+  },
+  {
+    "section_number": "6",
+    "title": "Investments",
+    "page_ref": "6.1",
+    "type": "section"
+  },
+  {
+    "section_number": "7",
+    "title": "Inventories",
+    "page_ref": "7.1",
+    "type": "section"
+  },
+  {
+    "section_number": "8",
+    "title": "Construction Contracts",
+    "page_ref": "8.1",
+    "type": "section"
+  },
+  {
+    "section_number": "9",
+    "title": "Impairment of Assets",
+    "page_ref": "9.1",
+    "type": "section"
+  },
+  {
+    "section_number": "10",
+    "title": "Provisions, Contingent Liabilities and Contingent Assets",
+    "page_ref": "10.1",
+    "type": "section"
+  },
+  {
+    "section_number": "11",
+    "title": "Revenue",
+    "page_ref": "11.1",
+    "type": "section"
+  },
+  {
+    "section_number": "12",
+    "title": "Government Grants and Other Government Assistance",
+    "page_ref": "12.1",
+    "type": "section"
+  },
+  {
+    "section_number": "13",
+    "title": "Borrowing Costs",
+    "page_ref": "13.1",
+    "type": "section"
+  },
+  {
+    "section_number": "14",
+    "title": "Income Taxes",
+    "page_ref": "14.1",
+    "type": "section"
+  },
+  {
+    "section_number": "15",
+    "title": "The Effects of Changes in Foreign Exchange Rates",
+    "page_ref": "15.1",
+    "type": "section"
+  },
+  {
+    "section_number": "16",
+    "title": "Related  Party Disclosures",
+    "page_ref": "16.1",
+    "type": "section"
+  },
+  {
+    "section_number": "17",
+    "title": "Events After the End of the R eporting Period",
+    "page_ref": "17.1",
+    "type": "section"
+  },
+  {
+    "section_number": "18",
+    "title": "Business Combinations and Goodwill",
+    "page_ref": "18.1",
+    "type": "section"
+  },
+  {
+    "section_number": "19",
+    "title": "Consolidated and Company -level  Financial Statements",
+    "page_ref": "19.1",
+    "type": "section"
+  },
+  {
+    "section_number": "20",
+    "title": "Investments in Associates",
+    "page_ref": "20.1",
+    "type": "section"
+  },
+  {
+    "section_number": "21",
+    "title": "Interests in Joint Ventures  and Other Forms of Joint Arrangements",
+    "page_ref": "21.1",
+    "type": "section"
+  },
+  {
+    "section_number": "22",
+    "title": "Cash Flow Statement  (optional)",
+    "page_ref": "22.1",
+    "type": "section"
+  },
+  {
+    "section_number": "Appendix 1",
+    "title": "Examples  of Application",
+    "page_ref": "N/A",
+    "type": "appendix"
+  },
+  {
+    "section_number": "Appendix 2",
+    "title": "Illustrative Company -Level Financial Statements  Prepared in",
+    "page_ref": "N/A",
+    "type": "appendix"
+  },
+  {
+    "section_number": "Appendix 3",
+    "title": "Illustrative Consolidated Financial Statements  Prepared in",
+    "page_ref": "N/A",
+    "type": "appendix"
+  },
+  {
+    "section_number": "Appendix 1",
+    "title": "to",
+    "page_ref": "N/A",
+    "type": "appendix"
+  }
+]

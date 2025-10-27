@@ -78,7 +78,7 @@ class ChunkCategorizationOutput(BaseModel):
 
     chunk_type: str = Field(
         ...,
-        description="Type of content: definition|requirement|example|guidance|disclosure|measurement",
+        description="Type of content: definition|requirement|example|template|guidance|disclosure|measurement",
     )
     confidence_score: float = Field(
         ...,
@@ -104,6 +104,7 @@ class ChunkCategorizationOutput(BaseModel):
             "definition",
             "requirement",
             "example",
+            "template",
             "guidance",
             "disclosure",
             "measurement",
@@ -132,15 +133,23 @@ class ChunkCategorizationOutput(BaseModel):
 
 
 class ChunkCategorizationSignature(dspy.Signature):
-    """Categorize a knowledge base chunk into one of six types with confidence scoring.
+    """Categorize a knowledge base chunk into one of seven types with confidence scoring.
 
     Chunk Types:
     - definition: Core accounting term definitions (e.g., "Revenue is the gross inflow...")
     - requirement: Mandatory accounting treatment requirements (e.g., "An entity shall...")
     - example: Illustrative examples or scenarios (e.g., "For instance, if a company...")
+    - template: Copy-paste ready accounting policy templates or illustrative statements (typically in appendices)
     - guidance: Implementation guidance and best practices (e.g., "Entities should consider...")
     - disclosure: Required financial statement disclosures (e.g., "The entity shall disclose...")
     - measurement: Measurement and recognition criteria (e.g., "Measure at fair value...")
+
+    Template Detection Guidelines:
+    - Templates are typically found in appendices titled "Illustrative Financial Statements" or "Model Financial Statements"
+    - Templates contain complete, ready-to-use accounting policy wording
+    - Templates often have section headings like "Accounting Policies" or specific policy names
+    - Templates are distinguished from examples by being complete, formal policy statements
+    - High confidence (≥0.90) if chunk contains phrases like "Illustrative accounting policy" or is from appendix sections
 
     Confidence Scoring Guidelines:
     - 0.90-1.00: Very clear indicators, unambiguous categorization
@@ -151,7 +160,7 @@ class ChunkCategorizationSignature(dspy.Signature):
     Important Notes:
     - Focus on the PRIMARY purpose of the chunk
     - Use document title for context (e.g., standards vs. guidance documents)
-    - Consider chunk position (definitions often appear early)
+    - Consider chunk position (definitions often appear early, templates often in appendices)
     - Provide explicit reasoning for your categorization
     """
 
@@ -166,7 +175,7 @@ class ChunkCategorizationSignature(dspy.Signature):
     )
 
     chunk_type: str = dspy.OutputField(
-        desc="One of: definition|requirement|example|guidance|disclosure|measurement"
+        desc="One of: definition|requirement|example|template|guidance|disclosure|measurement"
     )
     confidence_score: float = dspy.OutputField(
         desc="Confidence score from 0.0 to 1.0 (≥0.85 for auto-approval)"
@@ -255,6 +264,7 @@ class ChunkCategorizer:
         "definition",
         "requirement",
         "example",
+        "template",
         "guidance",
         "disclosure",
         "measurement",
@@ -337,7 +347,7 @@ class ChunkCategorizer:
 
         # Execute DSPy prediction
         try:
-            prediction = self.module.forward(
+            prediction = self.module(
                 chunk_content=input_data.chunk_content,
                 kb_document_title=input_data.kb_document_title,
                 chunk_index=input_data.chunk_index,

@@ -1,6 +1,6 @@
 """Projects router for CRUD operations on audit projects."""
 
-from datetime import date
+from datetime import date, datetime
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -56,14 +56,26 @@ class ProjectResponse(BaseModel):
 
     id: int
     client_id: int
+    client_name: Optional[str] = None  # Populated from client relationship
     jurisdiction: str
     accounting_standard: str
     financial_year_end: date
     project_name: Optional[str]
     status: str
+    created_at: datetime
+    updated_at: datetime
 
     class Config:
         from_attributes = True
+
+
+class ProjectListResponse(BaseModel):
+    """Paginated project list response."""
+
+    projects: List["ProjectResponse"]
+    total: int
+    page: int
+    page_size: int
 
 
 @router.post("/clients", response_model=ClientResponse, status_code=status.HTTP_201_CREATED)
@@ -213,35 +225,87 @@ async def create_project(
         ip_address=deps.ip_address,
     )
 
-    return project
+    # Return response with client_name
+    return ProjectResponse(
+        id=project.id,
+        client_id=project.client_id,
+        client_name=client.company_name,
+        jurisdiction=project.jurisdiction,
+        accounting_standard=project.accounting_standard,
+        financial_year_end=project.financial_year_end,
+        project_name=project.project_name,
+        status=project.status,
+        created_at=project.created_at,
+        updated_at=project.updated_at,
+    )
 
 
-@router.get("/", response_model=List[ProjectResponse])
+@router.get("/", response_model=ProjectListResponse)
 async def list_projects(
     deps: CommonDeps = Depends(),
-    skip: int = 0,
-    limit: int = 100,
-    status_filter: Optional[str] = None,
+    page: int = 1,
+    page_size: int = 20,
+    status: Optional[str] = None,
+    jurisdiction: Optional[str] = None,
+    search: Optional[str] = None,
 ):
-    """List all projects for current tenant.
+    """List all projects for current tenant with pagination.
 
     Args:
         deps: Common dependencies
-        skip: Number of records to skip
-        limit: Maximum number of records to return
-        status_filter: Optional status filter (draft, in_progress, completed)
+        page: Page number (1-indexed)
+        page_size: Number of records per page
+        status: Optional status filter (draft, processing, review, approved, completed, failed)
+        jurisdiction: Optional jurisdiction filter (HK, SG, AU)
+        search: Optional search term for project name or client name
 
     Returns:
-        List of projects
+        Paginated list of projects
     """
+    # Build query with client join
     query = deps.db.query(Project).filter(Project.tenant_id == deps.tenant_id)
 
-    if status_filter:
-        query = query.filter(Project.status == status_filter)
+    # Apply filters
+    if status:
+        query = query.filter(Project.status == status)
 
-    projects = query.offset(skip).limit(limit).all()
+    if jurisdiction:
+        query = query.filter(Project.jurisdiction == jurisdiction)
 
-    return projects
+    if search:
+        # Search in project_name
+        query = query.filter(Project.project_name.ilike(f"%{search}%"))
+
+    # Get total count
+    total = query.count()
+
+    # Apply pagination
+    skip = (page - 1) * page_size
+    projects = query.offset(skip).limit(page_size).all()
+
+    # Convert to response model with client_name
+    project_responses = []
+    for project in projects:
+        project_dict = {
+            "id": project.id,
+            "client_id": project.client_id,
+            "client_name": project.client.company_name if project.client else None,
+            "jurisdiction": project.jurisdiction,
+            "accounting_standard": project.accounting_standard,
+            "financial_year_end": project.financial_year_end,
+            "project_name": project.project_name,
+            "status": project.status,
+            "created_at": project.created_at,
+            "updated_at": project.updated_at,
+        }
+        project_responses.append(ProjectResponse(**project_dict))
+
+    return ProjectListResponse(
+        projects=project_responses,
+        total=total,
+        page=page,
+        page_size=page_size,
+    )
 
 
 @router.get("/{project_id}", response_model=ProjectResponse)
@@ -284,7 +348,19 @@ async def get_project(
         ip_address=deps.ip_address,
     )
 
-    return project
+    # Return response with client_name
+    return ProjectResponse(
+        id=project.id,
+        client_id=project.client_id,
+        client_name=project.client.company_name if project.client else None,
+        jurisdiction=project.jurisdiction,
+        accounting_standard=project.accounting_standard,
+        financial_year_end=project.financial_year_end,
+        project_name=project.project_name,
+        status=project.status,
+        created_at=project.created_at,
+        updated_at=project.updated_at,
+    )
 
 
 @router.delete("/{project_id}", status_code=status.HTTP_204_NO_CONTENT)

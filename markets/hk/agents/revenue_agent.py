@@ -21,6 +21,12 @@ class RevenueDisclosureSignature(dspy.Signature):
     """Generate revenue recognition disclosure following HKFRS 15 or SME-FRS."""
 
     # Inputs
+    template: str = dspy.InputField(
+        desc="Disclosure template with formatting requirements and structure guidance from standards"
+    )
+    requirements: str = dspy.InputField(
+        desc="Mandatory and optional disclosure requirements from accounting standards with source references"
+    )
     trial_balance: str = dspy.InputField(
         desc="Trial balance data in JSON format with revenue accounts"
     )
@@ -31,12 +37,12 @@ class RevenueDisclosureSignature(dspy.Signature):
         desc="Accounting standard to follow (HKFRS or SME-FRS)"
     )
     context: str = dspy.InputField(
-        desc="Relevant guidance from knowledge base on revenue recognition"
+        desc="Additional relevant guidance from knowledge base on revenue recognition"
     )
 
     # Outputs
     disclosure: str = dspy.OutputField(
-        desc="Complete revenue recognition disclosure text following the accounting standard"
+        desc="Complete revenue recognition disclosure text following the template and requirements"
     )
     confidence: float = dspy.OutputField(
         desc="Confidence score (0-1) in the disclosure quality"
@@ -45,7 +51,7 @@ class RevenueDisclosureSignature(dspy.Signature):
         desc="Completeness score (0-1) - how much of required disclosure is covered"
     )
     sources_used: str = dspy.OutputField(
-        desc="List of source references used (e.g., 'HKFRS 15, paragraph 31')"
+        desc="List of source references used (e.g., 'HKFRS 15, paragraph 31, p.58')"
     )
 
 
@@ -56,16 +62,17 @@ class HKRevenueAgent(BaseFinancialAgent):
     using DSPy for structured generation with knowledge base retrieval.
     """
 
-    def __init__(self, market_config, retriever, tenant_id, user_id):
+    def __init__(self, market_config, retriever, tenant_id, user_id, job_id=None):
         """Initialize HK Revenue Agent.
 
         Args:
             market_config: HK market configuration
-            retriever: SecureKBRetriever for knowledge base
+            retriever: RAGOrchestrator for knowledge base
             tenant_id: Tenant ID
             user_id: User ID
+            job_id: Optional job ID for caching
         """
-        super().__init__(market_config, retriever, tenant_id, user_id)
+        super().__init__(market_config, retriever, tenant_id, user_id, job_id)
 
         # Initialize DSPy module (ChainOfThought for reasoning)
         self.dspy_module = dspy.ChainOfThought(RevenueDisclosureSignature)
@@ -96,21 +103,43 @@ class HKRevenueAgent(BaseFinancialAgent):
         return True
 
     def process(self, agent_input: AgentInput) -> AgentOutput:
-        """Process input and generate revenue disclosure.
+        """Process input and generate revenue disclosure using agentic RAG workflow.
+
+        Workflow:
+        1. Fetch template using AgenticRAG (autonomous reasoning)
+        2. Fetch requirements using AgenticRAG (autonomous reasoning)
+        3. Fetch additional context using AgenticRAG (if needed)
+        4. Generate disclosure using DSPy with template + requirements + context
+        5. Track all sources for audit trail
 
         Args:
             agent_input: Input data
 
         Returns:
-            Generated disclosure with sources
+            Generated disclosure with sources from all agentic searches
         """
         try:
             # Validate tenant
             self.validate_tenant(agent_input)
 
-            # Fetch relevant context from knowledge base
+            # Determine disclosure type based on standard
+            standard = self.market_config.accounting_standard
+            disclosure_type = self._get_disclosure_type(standard)
+
+            # Step 1: Fetch template using AgenticRAG
+            logger.info(f"[{self.agent_name}] Fetching template for {disclosure_type}")
+            template_result = self._fetch_template(disclosure_type)
+            template_text = template_result.answer
+
+            # Step 2: Fetch requirements using AgenticRAG
+            logger.info(f"[{self.agent_name}] Fetching requirements for {disclosure_type}")
+            requirements_result = self._fetch_requirements(disclosure_type)
+            requirements_text = requirements_result.answer
+
+            # Step 3: Fetch additional context using AgenticRAG
             query = self._build_retrieval_query(agent_input)
-            sources = self._fetch_context(query)
+            logger.info(f"[{self.agent_name}] Fetching additional context")
+            sources = self._fetch_context(query, use_agentic=True)
 
             # Build context string for DSPy
             context_text = "\n\n".join([s.snippet for s in sources])
@@ -118,23 +147,37 @@ class HKRevenueAgent(BaseFinancialAgent):
             # Prepare inputs for DSPy
             trial_balance_str = str(agent_input.trial_balance)
             policies_str = str(agent_input.accounting_policies or "No specific policies provided")
-            standard = self.market_config.accounting_standard
 
-            # Generate disclosure using DSPy
+            # Generate disclosure using DSPy with template + requirements
+            logger.info(f"[{self.agent_name}] Generating disclosure with DSPy")
             result = self.dspy_module(
+                template=template_text,
+                requirements=requirements_text,
                 trial_balance=trial_balance_str,
                 accounting_policies=policies_str,
                 accounting_standard=standard,
                 context=context_text or "No additional context available",
             )
 
+            # Combine all sources from agentic searches
+            all_sources = self._combine_agentic_sources(
+                template_result, requirements_result, sources
+            )
+
             # Build output
             output = AgentOutput(
                 disclosure_text=result.disclosure,
-                sources=sources,
+                sources=all_sources,
                 confidence_score=float(result.confidence) if result.confidence else 0.7,
                 completeness_score=float(result.completeness) if result.completeness else 0.7,
                 warnings=[],
+            )
+
+            logger.info(
+                f"[{self.agent_name}] Generation complete: "
+                f"{len(all_sources)} sources, "
+                f"confidence={output.confidence_score:.2f}, "
+                f"completeness={output.completeness_score:.2f}"
             )
 
             return output
@@ -202,3 +245,81 @@ class HKRevenueAgent(BaseFinancialAgent):
                 query += f" {policies['revenue_recognition']}"
 
         return query
+
+    def _get_disclosure_type(self, standard: str) -> str:
+        """Get disclosure type description based on accounting standard.
+
+        Args:
+            standard: Accounting standard (HKFRS or SME-FRS)
+
+        Returns:
+            Disclosure type description
+        """
+        if standard == "SME-FRS":
+            return "SME-FRS Section 23 Revenue disclosure for small and medium entities"
+        else:  # HKFRS
+            return "HKFRS 15 Revenue from Contracts with Customers disclosure"
+
+    def _combine_agentic_sources(
+        self,
+        template_result,
+        requirements_result,
+        context_sources: List[Source],
+    ) -> List[Source]:
+        """Combine sources from multiple agentic RAG searches.
+
+        Args:
+            template_result: AgenticRAGResult from template fetch
+            requirements_result: AgenticRAGResult from requirements fetch
+            context_sources: Source objects from context fetch
+
+        Returns:
+            Combined list of Source objects with proper attribution
+        """
+        from genreport.core.orchestration.agentic_rag_agent import AgenticRAGResult
+
+        all_sources = []
+
+        # Add sources from template result
+        for ref in template_result.references:
+            source = Source(
+                document_id=0,  # Metadata from agentic search
+                chunk_id=ref.ref_id,
+                relevance_score=ref.relevance_score,
+                snippet=ref.content_preview,
+                source_reference=ref.source,
+            )
+            all_sources.append(source)
+
+        # Add sources from requirements result
+        for ref in requirements_result.references:
+            source = Source(
+                document_id=0,  # Metadata from agentic search
+                chunk_id=ref.ref_id,
+                relevance_score=ref.relevance_score,
+                snippet=ref.content_preview,
+                source_reference=ref.source,
+            )
+            all_sources.append(source)
+
+        # Add context sources (already Source objects)
+        all_sources.extend(context_sources)
+
+        # Deduplicate by source_reference
+        seen = set()
+        unique_sources = []
+        for source in all_sources:
+            key = source.source_reference or f"{source.document_id}:{source.chunk_id}"
+            if key not in seen:
+                seen.add(key)
+                unique_sources.append(source)
+
+        logger.info(
+            f"[{self.agent_name}] Combined sources: "
+            f"{len(template_result.references)} template + "
+            f"{len(requirements_result.references)} requirements + "
+            f"{len(context_sources)} context = "
+            f"{len(unique_sources)} unique sources"
+        )
+
+        return unique_sources

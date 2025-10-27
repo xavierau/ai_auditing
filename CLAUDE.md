@@ -9,6 +9,116 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Current Status:** Planning Phase - Implementation follows a 6-sprint, 19-week master plan
 **Architecture:** Pragmatic Hybrid Architecture with tenant isolation and multi-region support
 
+## Frontend Design System
+
+**CRITICAL: All frontend development MUST follow the established design system.**
+
+### Design System Location
+`docs/architecture/2025-10-18-genreport-design-system.md`
+
+### Design System Rules
+
+**MANDATORY for ALL frontend work:**
+1. **ALWAYS** read the design system document BEFORE implementing ANY component
+2. **NEVER** create custom colors - use the defined palette (primary, success, warning, error, jurisdiction colors)
+3. **NEVER** use arbitrary spacing - follow the 4px base scale (p-6, gap-6, etc.)
+4. **ALWAYS** use Inter for sans-serif, JetBrains Mono for monospace
+5. **ALWAYS** use shadcn/ui components as the foundation
+6. **ALWAYS** follow the jurisdiction badge pattern (HK=blue, SG=green, AU=amber)
+7. **ALWAYS** implement proper accessibility (WCAG 2.1 AA)
+8. **ALWAYS** support dark mode using CSS variables
+
+### Key Design System Components
+
+From `docs/architecture/2025-10-18-genreport-design-system.md`:
+
+**Colors:**
+- Primary: `bg-primary-600 hover:bg-primary-500` (blue)
+- Success: `bg-success-500` (green)
+- Warning: `bg-warning-500` (amber)
+- Error: `bg-error-500` (red)
+- Jurisdiction badges: HK (blue), SG (green), AU (amber)
+
+**Typography:**
+- Page titles: `text-3xl font-bold text-gray-900`
+- Section headers: `text-xl font-semibold text-gray-900`
+- Body text: `text-sm font-normal text-gray-700`
+- Numeric data: `font-mono text-right tabular-nums`
+
+**Spacing:**
+- Card padding: `p-6` (24px)
+- Button padding: `px-6 py-3`
+- Form field gaps: `space-y-4`
+- Section gaps: `gap-6`
+
+**When implementing frontend:**
+```bash
+# 1. Read design system
+cat docs/architecture/2025-10-18-genreport-design-system.md
+
+# 2. Use existing shadcn/ui components
+npx shadcn@latest add [component-name]
+
+# 3. Follow the component patterns exactly as specified
+
+# 4. MANDATORY: Verify implementation with Chrome DevTools
+# - Start dev server: npm run dev
+# - Use mcp__chrome-devtools__navigate_page to open localhost
+# - Use mcp__chrome-devtools__take_screenshot to capture implementation
+# - Verify: colors, spacing, typography, responsive layout, accessibility
+```
+
+### Frontend Verification Protocol
+
+**CRITICAL: ALWAYS verify frontend implementations with Chrome DevTools before marking complete.**
+
+**Required Steps:**
+1. **Start Development Server:**
+   ```bash
+   npm run dev
+   ```
+
+2. **Navigate to Component:**
+   - Use `mcp__chrome-devtools__navigate_page` to open `http://localhost:5173`
+   - Navigate to the specific component/page being implemented
+
+3. **Visual Verification:**
+   - Use `mcp__chrome-devtools__take_screenshot` to capture the implementation
+   - Verify against design system:
+     - ✅ Colors match specification (primary, jurisdiction, status badges)
+     - ✅ Typography uses correct fonts (Inter, JetBrains Mono)
+     - ✅ Spacing follows 4px base scale (p-6, gap-6, etc.)
+     - ✅ Components match design system patterns exactly
+
+4. **Responsive Testing:**
+   - Use `mcp__chrome-devtools__resize_page` to test different viewports:
+     - Mobile: 640px width
+     - Tablet: 768px width
+     - Desktop: 1280px width
+   - Take screenshots at each breakpoint
+
+5. **Accessibility Check:**
+   - Verify keyboard navigation works
+   - Check focus indicators (ring-2 ring-blue-500)
+   - Verify ARIA labels and roles
+
+6. **Console Errors:**
+   - Use `mcp__chrome-devtools__list_console_messages` to check for errors
+   - Fix any warnings or errors before marking complete
+
+**Example Verification Workflow:**
+```
+1. Implement component
+2. npm run dev
+3. mcp__chrome-devtools__navigate_page("http://localhost:5173")
+4. mcp__chrome-devtools__take_screenshot() - Desktop view
+5. mcp__chrome-devtools__resize_page(640, 800)
+6. mcp__chrome-devtools__take_screenshot() - Mobile view
+7. mcp__chrome-devtools__list_console_messages() - Check errors
+8. Verify screenshot matches design system
+9. Mark component as complete
+```
+
 ## Core Architecture Principles
 
 ### Hybrid Architecture Pattern
@@ -161,6 +271,12 @@ Context: core/orchestration/base_agent.py for base class pattern
 - Implementing XSS/CSRF protection in React
 - Performance optimization (memoization, virtualization)
 
+**CRITICAL: ALWAYS reference the design system:**
+- **MANDATORY:** Read `docs/architecture/2025-10-18-genreport-design-system.md` BEFORE implementing ANY frontend component
+- All components MUST follow the established design system
+- Use specified colors, typography, spacing, and component patterns
+- Maintain consistency with shadcn/ui components
+
 **EXAMPLE USAGE:**
 ```
 User: "Create the report review interface with market-aware formatting"
@@ -180,6 +296,7 @@ Requirements:
 - No prop drilling (use context for market config)
 - Memoize expensive formatting operations
 - Handle loading/error states properly
+- MUST follow design system: docs/architecture/2025-10-18-genreport-design-system.md
 ```
 
 ### @bug-hunter - Bug Investigation & Resolution
@@ -672,28 +789,176 @@ class SecureOrchestrator:
         return context
 ```
 
-## Documentation Standards
+## Documentation System
 
-Follow the structured documentation approach defined in global CLAUDE.md:
+The project follows a comprehensive, well-organized documentation structure. **All documentation directories have comprehensive README indexes** for easy navigation.
+
+### Documentation Structure
 
 ```
 docs/
 ├── architecture/            # Design decisions (create BEFORE implementation)
-│   └── YYYY-MM-DD-topic.md
+│   ├── README.md           # Comprehensive architecture index (START HERE)
+│   └── YYYY-MM-DD-topic.md # 5 active architecture documents
+│
 ├── guides/                  # Implementation guides (create DURING development)
-│   └── YYYY-MM-DD-topic.md
-└── reports/                 # Status reports
-    └── YYYY-MM-DD-topic.md
+│   ├── README.md           # Comprehensive guides index by category
+│   └── YYYY-MM-DD-topic.md # 14 active implementation guides
+│
+└── reports/                 # Sprint completion and feature implementation reports
+    ├── README.md           # Comprehensive reports index
+    ├── YYYY-MM-DD-*.md     # 13 active high-level reports
+    └── archive/            # Detailed phase reports and historical documents
+        ├── *.md            # 14 archived granular reports
+        └── sprint-phases/  # 12 detailed sprint phase reports
 
 debugging_journals/          # MANDATORY after fixing bugs
 └── YYYY-MM-DD-issue-description.md
 ```
 
-**When implementing major features:**
-1. Create architecture doc BEFORE coding
-2. Update implementation guides DURING development
-3. Create debugging journal if fixing bugs
-4. Review and update existing docs when making changes
+### Documentation Navigation
+
+**CRITICAL: Each directory has a comprehensive README.md index.**
+
+**For Architecture Decisions:**
+- **Start here:** `docs/architecture/README.md`
+- Contains quick reference, document relationships diagram, reading guides
+- All docs cross-reference related architecture, implementations, and guides
+- Documents include version history and implementation status
+
+**For Implementation Guidance:**
+- **Start here:** `docs/guides/README.md`
+- Organized by category: AI/ML, Knowledge Base, API, Operations, Security
+- Each guide includes "When to Use" and "Related Files" sections
+- Reading guides for different roles (Backend, DevOps, Data Scientists)
+
+**For Project Status and Completion:**
+- **Start here:** `docs/reports/README.md`
+- Sprint completion reports (Sprints 1-6)
+- Feature implementation reports (retrieval, RAG, agentic AI)
+- Granular details archived in `archive/` and `archive/sprint-phases/`
+- Reading guides for different roles (PM, Developers, Architects)
+
+### Documentation Workflow
+
+**Before Starting Work:**
+1. **Check architecture docs** - `docs/architecture/README.md` for design decisions
+2. **Check guides** - `docs/guides/README.md` for implementation patterns
+3. **Check reports** - `docs/reports/README.md` for current feature status
+
+**During Implementation:**
+
+**Phase 1: Planning (Major Features Only)**
+1. Create architecture doc in `docs/architecture/YYYY-MM-DD-topic.md`
+2. Document design decisions, ADRs, component interfaces
+3. Add entry to `docs/architecture/README.md`
+4. Cross-reference related docs
+
+**Phase 2: Development**
+1. Create/update implementation guide in `docs/guides/YYYY-MM-DD-topic.md`
+2. Include step-by-step instructions, code examples
+3. Add "When to Use" and "Related Files" sections
+4. Update `docs/guides/README.md` index
+
+**Phase 3: Completion**
+1. Create completion report in `docs/reports/YYYY-MM-DD-topic.md`
+2. Include deliverables, test results, next steps
+3. Update `docs/reports/README.md` index
+4. Update related architecture docs with implementation status
+
+**Bug Fixes:**
+1. **MANDATORY:** Create debugging journal in `debugging_journals/YYYY-MM-DD-issue.md`
+2. Include root cause analysis, solution, prevention strategies
+3. Reference related docs and code files
+
+### Documentation Best Practices
+
+**File Naming:**
+- Always use `YYYY-MM-DD-descriptive-name.md` format
+- Makes chronological ordering automatic
+
+**Cross-Referencing:**
+- Architecture docs reference guides and reports
+- Guides reference architecture decisions and code files
+- Reports reference architecture and guides
+- All documents include version history
+
+**When to Create Each Document Type:**
+
+| Type | When to Create | Required Sections |
+|------|---------------|-------------------|
+| **Architecture** | BEFORE implementing major features | Purpose, Component Design, ADRs, Related Docs |
+| **Guide** | DURING development | When to Use, Prerequisites, Step-by-Step, Related Files |
+| **Report** | AFTER completing sprints/features | Summary, Deliverables, Test Results, Next Steps |
+| **Debugging Journal** | AFTER fixing any bug | Issue, Root Cause, Solution, Prevention |
+
+**Updating Existing Docs:**
+- When making changes, review and update related docs
+- Add version history entry (v1.1, v1.2, etc.)
+- Update implementation status if applicable
+- Update README indexes if adding new categories
+
+### Quick Reference Commands
+
+```bash
+# View architecture index
+cat docs/architecture/README.md
+
+# View guides index
+cat docs/guides/README.md
+
+# View reports index
+cat docs/reports/README.md
+
+# Search for specific topic across all docs
+grep -r "topic" docs/
+
+# List recent documentation
+ls -lt docs/{architecture,guides,reports}/*.md | head -20
+```
+
+### Documentation Examples
+
+**Example: Implementing a New Feature**
+```
+1. Read docs/architecture/README.md for related designs
+2. Create docs/architecture/2025-10-XX-new-feature.md
+3. Implement feature following TDD
+4. Create docs/guides/2025-10-XX-new-feature-implementation.md
+5. Complete implementation
+6. Create docs/reports/2025-10-XX-new-feature-complete.md
+7. Update all README.md indexes
+```
+
+**Example: Finding Implementation Guidance**
+```
+1. Open docs/guides/README.md
+2. Navigate to relevant category (e.g., "AI/ML Implementation")
+3. Find guide (e.g., "Agentic RAG Integration")
+4. Follow "Related" links to architecture and code
+```
+
+**Example: Understanding System Architecture**
+```
+1. Open docs/architecture/README.md
+2. Review "Document Relationships" diagram
+3. Read architecture docs in order (retrieval → RAG → agentic)
+4. Check implementation status in docs/reports/README.md
+```
+
+### Archive Policy
+
+**When to Archive Reports:**
+- Granular phase reports after sprint completion
+- Bug fix reports after issue is resolved and documented
+- Interim progress reports superseded by completion reports
+- Keep in `archive/` or `archive/sprint-phases/` for historical reference
+
+**Never Archive:**
+- Architecture decisions (these remain relevant)
+- Implementation guides (these remain useful)
+- Sprint completion reports (high-level summaries)
+- Current feature implementation reports
 
 ## Performance Targets
 
@@ -840,6 +1105,7 @@ Now I'll proceed with implementing the first component using @dspy-expert...
 
 ## Critical Reminders
 
+### Backend Development
 1. **NEVER** skip tenant_id in database queries
 2. **ALWAYS** validate file types using magic bytes, not just extensions
 3. **ALWAYS** encrypt files at rest using tenant-specific keys
@@ -848,13 +1114,50 @@ Now I'll proceed with implementing the first component using @dspy-expert...
 6. **NEVER** import from `markets/` in `core/` modules
 7. **ALWAYS** write security tests alongside feature tests
 8. **NEVER** commit secrets or credentials to version control
-9. **ALWAYS** use appropriate sub-agents for complex implementation tasks
-10. **ALWAYS** provide sufficient context when invoking agents
+
+### Frontend Development
+9. **ALWAYS** read `docs/architecture/2025-10-18-genreport-design-system.md` BEFORE implementing ANY component
+10. **NEVER** create custom colors or spacing - use the design system
+11. **ALWAYS** use shadcn/ui components as the foundation
+12. **ALWAYS** implement WCAG 2.1 AA accessibility
+13. **ALWAYS** follow jurisdiction color conventions (HK=blue, SG=green, AU=amber)
+
+### Agent Usage
+14. **ALWAYS** use appropriate sub-agents for complex implementation tasks
+15. **ALWAYS** provide sufficient context when invoking agents
+16. **ALWAYS** reference design system when using @react-best-practices-expert
 
 ## Resource References
 
-- Master Sprint Plan: `docs/master_sprint_plan.md`
-- Sprint Details: `docs/sprint_N_*.md` (N=1-6)
-- Database Schema: See Sprint 1 documentation
-- Security Architecture: See Sprint 1 and Sprint 6 documentation
+### Documentation (START HERE)
+
+**Primary Documentation Indexes:**
+- **Architecture Decisions:** `docs/architecture/README.md` (5 active design documents)
+- **Implementation Guides:** `docs/guides/README.md` (14 guides organized by category)
+- **Status Reports:** `docs/reports/README.md` (13 sprint/feature completion reports)
+
+**Key Documents:**
+- **Design System:** `docs/architecture/2025-10-18-genreport-design-system.md` (MANDATORY for ALL frontend work)
+- **Retrieval Architecture:** `docs/architecture/2025-10-22-retrieval-optimization-plan.md`
+- **RAG System:** `docs/architecture/2025-10-23-rag-orchestrator-design.md`
+- **Agentic AI:** `docs/architecture/2025-10-23-agentic-rag-react-design.md`
+
+**Operational Guides:**
+- **Production Deployment:** `docs/guides/2025-10-21-production-deployment-guide.md`
+- **Disaster Recovery:** `docs/guides/2025-10-21-disaster-recovery-runbook.md`
+- **Security Scanning:** `docs/guides/2025-10-21-security-scanning-guide.md`
+
+### Code Organization
+
+- Database Models: `genreport/core/database/models.py`
+- Security Components: `genreport/core/security/`
+- AI Agents: `genreport/core/orchestration/`, `markets/hk/agents/`
+- Retrieval System: `genreport/core/retrieval/`
+- API Endpoints: `genreport/api/routers/`
 - Market Config Examples: `markets/hk/config.py`
+
+### Interactive Examples
+
+- Knowledge Base Ingestion: `notebooks/01_kb_ingestion.ipynb`
+- Structure-Aware Retrieval: `notebooks/03_structure_aware_demo.py`
+- Agentic RAG Demo: `notebooks/04_agentic_rag_demo.py`

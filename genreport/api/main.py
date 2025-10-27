@@ -33,10 +33,32 @@ async def lifespan(app: FastAPI):
     logger.info(f"Starting {settings.app_name} in {settings.app_env} mode")
     logger.info(f"Debug mode: {settings.debug}")
 
-    # TODO: Initialize services
+    # Initialize DSPy with Gemini
+    try:
+        import dspy
+
+        if not settings.google_api_key or settings.google_api_key == "your-google-api-key":
+            logger.warning(
+                "GOOGLE_API_KEY not configured. DSPy LLM calls will fail. "
+                "Please set GOOGLE_API_KEY in .env file."
+            )
+        else:
+            # Configure DSPy with Gemini 2.5 Flash
+            lm = dspy.LM(
+                "gemini/gemini-2.5-flash",
+                api_key=settings.google_api_key,
+                temperature=0.0,  # Deterministic for audit disclosures
+            )
+            dspy.configure(lm=lm)
+            logger.info("✅ DSPy configured with Gemini 2.5 Flash")
+
+    except Exception as e:
+        logger.error(f"Failed to initialize DSPy: {e}", exc_info=True)
+        logger.warning("Agent-based report generation will fail without DSPy configuration")
+
+    # TODO: Initialize other services
     # - Database connection pool verification
     # - Redis connection verification
-    # - LLM client initialization
     # - Langfuse initialization
 
     yield
@@ -161,10 +183,18 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             return {k: convert_bytes(v) for k, v in obj.items()}
         elif isinstance(obj, list):
             return [convert_bytes(item) for item in obj]
+        # Handle non-serializable objects (FormData, etc.)
+        elif not isinstance(obj, (str, int, float, bool, type(None))):
+            return str(obj)
         return obj
 
     errors = convert_bytes(exc.errors())
-    body = convert_bytes(exc.body)
+
+    # Try to convert body, but skip if it's not serializable
+    try:
+        body = convert_bytes(exc.body) if exc.body else None
+    except (TypeError, AttributeError):
+        body = None
 
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -208,6 +238,25 @@ async def root():
     }
 
 
+# CSRF Token endpoint (top-level for frontend compatibility)
+@app.get(f"/api/{settings.api_version}/csrf-token", tags=["Security"])
+async def get_csrf_token():
+    """Get CSRF token for the frontend.
+
+    Returns a simple CSRF token that the frontend can use.
+    In production, this should be more sophisticated with token validation.
+
+    Returns:
+        CSRF token
+    """
+    import secrets
+
+    # Generate a random token
+    csrf_token = secrets.token_hex(32)
+
+    return {"csrf_token": csrf_token}
+
+
 # Health check endpoints
 @app.get("/health", tags=["Health"])
 async def health_check():
@@ -240,7 +289,7 @@ async def readiness_check():
 
 
 # Include routers
-from genreport.api.routers import auth, files, projects, parsing, kb, reports
+from genreport.api.routers import auth, files, projects, parsing, kb, reports, export
 
 app.include_router(
     auth.router, prefix=f"/api/{settings.api_version}/auth", tags=["Authentication"]
@@ -259,6 +308,9 @@ app.include_router(
 )
 app.include_router(
     reports.router, tags=["Reports"]  # reports.router already has prefix
+)
+app.include_router(
+    export.router, prefix=f"/api/{settings.api_version}", tags=["Export"]
 )
 
 

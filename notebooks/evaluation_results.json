@@ -1,0 +1,37 @@
+{
+  "timestamp": "2025-10-23T16:19:51.389206",
+  "chunking_comparison": {
+    "old_strategy": {
+      "total_chunks": 711,
+      "avg_size": 1411.6132208157524,
+      "min_size": 103,
+      "max_size": 11332,
+      "has_section_context": false,
+      "has_content_type": false
+    },
+    "new_strategy": {
+      "total_chunks": 250,
+      "avg_size": 1504.852,
+      "min_size": 302,
+      "max_size": 11830,
+      "has_section_context": true,
+      "has_content_type": true,
+      "chunks_with_section_num": 1,
+      "content_types": {
+        "requirement": 53,
+        "definition": 1,
+        "template": 1,
+        "general": 191,
+        "example": 4
+      }
+    }
+  },
+  "test_queries_count": 10,
+  "metrics_summary": {
+    "total_queries": 10,
+    "passed": 3,
+    "failed": 7,
+    "avg_similarity": 0.7492685735225677,
+    "avg_mrr": 0.3
+  }
+}
